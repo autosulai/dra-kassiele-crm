@@ -10,9 +10,9 @@ export const escritorio = {
   email: 'contato@kassieleadvocacia.adv.br',
   horario: 'Segunda a sexta das 09:00 às 18:00',
   logo: null,
-  chatwootUrl: 'https://app.chatwoot.com/app/login',
-  chatwootToken: '',
-  chatwootAccountId: '1',
+  chatwootUrl: import.meta.env.VITE_CHATWOOT_URL || '',
+  chatwootToken: import.meta.env.VITE_CHATWOOT_TOKEN || '',
+  chatwootAccountId: import.meta.env.VITE_CHATWOOT_ACCOUNT_ID || '1',
   advogados: [
     { id: 'a1', nome: 'Dra. Kassiele', area: 'Previdenciário (BPC/INSS)', cor: 'indigo', oab: 'OAB/RS 88.412' },
     { id: 'a2', nome: 'Equipe Operacional', area: 'Suporte & Triagem INSS', cor: 'slate', oab: 'Interno' },

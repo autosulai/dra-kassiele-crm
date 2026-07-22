@@ -1050,16 +1050,11 @@ function CfgEscritorio({ flash, onUpdateEscritorio, escritorioState }) {
 
 function CfgIntegracoes({ flash, onUpdateEscritorio, escritorioState }) {
   const esc = escritorioState || escritorio;
-  const [chatwootUrl, setChatwootUrl] = useState(esc.chatwootUrl || 'https://app.chatwoot.com/app/login');
-  const [chatwootToken, setChatwootToken] = useState(esc.chatwootToken || '');
-  const [chatwootAccountId, setChatwootAccountId] = useState(esc.chatwootAccountId || '1');
+  const chatwootUrl = import.meta.env.VITE_CHATWOOT_URL;
 
   const salvarIntegracoes = (e) => {
     e.preventDefault();
-    if (onUpdateEscritorio) {
-      onUpdateEscritorio({ chatwootUrl, chatwootToken, chatwootAccountId });
-    }
-    flash('✓ Configurações do Chatwoot salvas e ativas na aba Chat!');
+    flash('As configurações do Chatwoot agora são gerenciadas via variáveis de ambiente (.env)!');
   };
 
   return (
@@ -1075,52 +1070,25 @@ function CfgIntegracoes({ flash, onUpdateEscritorio, escritorioState }) {
               <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Atendimento Omnichannel da Evolution API com IA ao lado</span>
             </div>
           </div>
-          <span className="cj-mini ok"><span className="cj-livedot"/> Ativo no painel</span>
+          <span className="cj-mini ok"><span className="cj-livedot"/> Ativo via .env</span>
         </div>
         <p className="cj-card-p" style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5, marginTop: 4 }}>
-          Cole abaixo os dados da sua instância <b>Chatwoot</b> (integrado à Evolution API). Na aba <b>Chat</b>, você poderá usar o Chatwoot embutido no centro da tela para ouvir áudios e gerenciar chamados em tempo real, enquanto o nosso <b>Painel CRM & IA</b> fica disponível na lateral!
+          A integração com o Chatwoot está habilitada através do arquivo <b>.env</b> por questões de segurança.
         </p>
 
         <div className="cj-field" style={{ marginTop: 14 }}>
-          <label>URL da Caixa de Entrada do Chatwoot</label>
+          <label>URL Configurada (Apenas Leitura)</label>
           <input
             type="text"
-            value={chatwootUrl}
-            onChange={e => setChatwootUrl(e.target.value)}
-            placeholder="Ex: https://chatwoot.seudominio.com/app/accounts/1/inbox/1"
-            style={{ fontFamily: 'monospace', fontSize: 13 }}
+            value={chatwootUrl || 'Não configurada no .env'}
+            disabled
+            style={{ fontFamily: 'monospace', fontSize: 13, background: 'var(--bg)', color: 'var(--ink-3)', cursor: 'not-allowed' }}
           />
         </div>
 
-        <div className="cj-field-row" style={{ marginTop: 14 }}>
-          <div className="cj-field" style={{ flex: 2 }}>
-            <label>API Access Token do Usuário</label>
-            <input
-              type="password"
-              value={chatwootToken}
-              onChange={e => setChatwootToken(e.target.value)}
-              placeholder="Cole seu token de acesso da API"
-              style={{ fontFamily: 'monospace', fontSize: 13 }}
-            />
-          </div>
-          <div className="cj-field" style={{ flex: 1 }}>
-            <label>Account ID</label>
-            <input
-              type="text"
-              value={chatwootAccountId}
-              onChange={e => setChatwootAccountId(e.target.value)}
-              placeholder="Ex: 1"
-              style={{ fontFamily: 'monospace', fontSize: 13 }}
-            />
-          </div>
-        </div>
-
         <div className="cj-card-actions" style={{ marginTop: 16 }}>
-          <button type="submit" className="cj-btn">
-            <Icon name="check" size={14}/> Salvar e Ativar no Chat
-          </button>
           <a
-            href={chatwootUrl || 'https://app.chatwoot.com/app/login'}
+            href={chatwootUrl || '#'}
             target="_blank"
             rel="noreferrer"
             className="cj-btn ghost"
