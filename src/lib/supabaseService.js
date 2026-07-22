@@ -141,6 +141,9 @@ export async function loadAllCRMData() {
         email: escDb.email || mockEscritorio.email,
         horario: escDb.horario || mockEscritorio.horario,
         logo: escDb.logo || mockEscritorio.logo,
+        chatwootUrl: mockEscritorio.chatwootUrl,
+        chatwootToken: mockEscritorio.chatwootToken,
+        chatwootAccountId: mockEscritorio.chatwootAccountId,
         instagram: escDb.instagram_url || '',
         site: escDb.site_url || '',
         advogados: advogadosMapeados
