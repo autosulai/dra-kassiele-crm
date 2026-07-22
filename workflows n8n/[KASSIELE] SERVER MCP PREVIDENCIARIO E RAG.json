@@ -1,0 +1,318 @@
+{
+  "name": "[KASSIELE] SERVER MCP PREVIDENCIARIO E RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# MCP SERVER — TOOLS PREVIDENCIÁRIAS (INSS)",
+        "height": 400,
+        "width": 2200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "sticky-mcp-previ",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        192
+      ],
+      "id": "tool-datetime",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "path": "kassiele-previdenciario"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        992,
+        -48
+      ],
+      "id": "mcp-trigger-previ",
+      "name": "MCP Server Trigger"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Retorna o chassi 360° do lead: funil atual, etapa, checklist de documentos pendentes/recebidos, próximas perícias INSS agendadas e diretrizes internas (obs_interna). Chamar sempre no início da conversa.",
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": "=1",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        304,
+        192
+      ],
+      "id": "tool-contexto-lead",
+      "name": "contexto_lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Classifica o segurado em um dos funis especializados após a pergunta sobre contribuição: 'BPC_LOAS' (não contribui/idoso/PCD) ou 'AUXILIO_DOENCA' (contribuinte com incapacidade).",
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado','string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "funil_slug",
+              "fieldValue": "={{ $fromAI('funil_slug','BPC_LOAS ou AUXILIO_DOENCA','string') }}"
+            },
+            {
+              "fieldId": "etapa_slug",
+              "fieldValue": "triagem"
+            },
+            {
+              "fieldId": "contribuinte",
+              "fieldValue": "={{ $fromAI('contribuinte','true ou false','boolean') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        512,
+        192
+      ],
+      "id": "tool-classificar",
+      "name": "classificar_lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Atualiza os dados médicos e sociais coletados na triagem: tem_cadunico, doenca_relatada, ultima_contribuicao.",
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('telefone','Telefone','string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "tem_cadunico",
+              "fieldValue": "={{ $fromAI('tem_cadunico','true ou false','boolean') }}"
+            },
+            {
+              "fieldId": "doenca_relatada",
+              "fieldValue": "={{ $fromAI('doenca_relatada','Resumo do problema de saúde ou CID','string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        720,
+        192
+      ],
+      "id": "tool-atualizar",
+      "name": "atualizar_lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Move o card do segurado no funil Kanban do CRM (ex.: para 'coleta_docs', 'assinatura', 'analise_medica').",
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('telefone','Telefone','string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "etapa_slug",
+              "fieldValue": "={{ $fromAI('etapa_slug','Slug da nova etapa','string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        928,
+        192
+      ],
+      "id": "tool-avancar",
+      "name": "avancar_etapa",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulta resumos processuais, laudos e peças que o advogado liberou explicitamente com a pílula verde (liberado_cliente = true) no CRM para informar ao cliente.",
+        "operation": "getAll",
+        "tableId": "documentos_cliente",
+        "limit": "=5",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "liberado_cliente",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        192
+      ],
+      "id": "tool-consultar-rag",
+      "name": "consultar_andamento",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "contexto_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "classificar_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizar_lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "avancar_etapa": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_andamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timezone": "America/Sao_Paulo"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

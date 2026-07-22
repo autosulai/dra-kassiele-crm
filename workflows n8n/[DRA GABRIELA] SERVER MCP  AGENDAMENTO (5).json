@@ -1,0 +1,544 @@
+{
+  "name": "[DRA GABRIELA] SERVER MCP  AGENDAMENTO",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# MCP SERVER",
+        "height": 400,
+        "width": 1856,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "ef0a492c-7b5e-45d3-912b-e0daea1981fb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        192
+      ],
+      "id": "d143d8b9-aa2c-4eba-a183-620414d53acb",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        192
+      ],
+      "id": "3ac98864-e4f2-4e4a-acbd-8e80893a0f93",
+      "name": "Think2"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "# USO DE ESTA TOOL — REAGENDAMIENTO\n\nUtilizar esta tool para **reagendar consultas** del consultorio de Gabriela Olivera.\n\n---\n\n## ENTRADAS Y RESOLUCIÓN AUTOMÁTICA\n- `telefono`: el teléfono del paciente se recibe como parámetro desde el agente que llama esta tool.\n\n### PASO INICIAL (OBLIGATORIO)\n- Buscar el agendamiento actual usando el teléfono:\n  - Si no se encuentra →  \n    \"No encontré tu consulta. ¿Querés que la busque por nombre o fecha?\"\n  - Si hay uno → seleccionarlo  \n  - Si hay más de uno → usar el más próximo  \n\n---\n\n## VALIDACIÓN DEL NUEVO DÍA\n\n- Cuando el paciente indique un nuevo día (o día + hora):\n  - Consultar disponibilidad inmediatamente  \n  - No responder sin mostrar horarios disponibles  \n\n---\n\n## HORARIOS PERMITIDOS\n\n### Lunes a viernes:\n- de las 08:45 a las 11:00 y de las 15:00 a 20:15  \n\n## DURACIÓN Y LÍMITES (OBLIGATORIO)\n- Duración fija: **45 minutos**  \n- Timezone: `\"America/Montevideo\"`  \n\n---\n\n## DISPONIBILIDAD\n- Si hay horarios libres → listar todos  \n- Si el paciente pidió un horario específico:\n  - Si está disponible → continuar  \n  - Si no → informar y sugerir opciones cercanas  \n\n---\n\n## PRESENTACIÓN AL PACIENTE\n- Mostrar horarios en lista simple:\n\n14:00  \n15:00  \n16:00  \n\n---\n\n## PROCESO DE REAGENDAMIENTO\n\n### PASO 1 — IDENTIFICAR CONSULTA ACTUAL\n- Confirmar:\n  - Fecha  \n  - Hora  \n\n---\n\n### PASO 2 — VALIDAR NUEVO HORARIO\n- Validar día hábil  \n- Validar disponibilidad  \n- Validar que esté dentro del horario permitido  \n\n---\n\n### PASO 3 — EJECUTAR\n1. Confirmar con el paciente el nuevo horario  \n2. Eliminar el agendamiento anterior  \n3. Crear el nuevo agendamiento  \n4. Mantener todos los datos del paciente  \n\n---\n\n## RESPUESTA FINAL\n\"Listo, [primer nombre del paciente].  \nTu consulta fue reagendada para el día [DD/MM/AAAA] a las [HH:MM].  \nTe esperamos.\"\n\n---\n\n## REGLAS INVIOLABLES\n✅ Siempre verificar disponibilidad  \n✅ Siempre confirmar con el paciente  \n✅ Eliminar antes de crear  \n✅ Mantener datos del paciente  \n\n❌ Nunca reagendar si el horario está ocupado  \n❌ Nunca reagendar fines de semana  \n❌ Nunca reagendar fuera del horario permitido  \n\n---\n\n## TRATAMIENTO DE CONFLICTOS\nSi el horario no está disponible:\n\n\"Ese horario no está disponible. Te paso otras opciones para ese día.\"\n\n---\n\n## REGLA DE COMUNICACIÓN\n- No explicar procesos internos  \n- No mencionar sistema ni validaciones  \n- Responder como una persona  \n\n✔ \"Estos son los horarios disponibles:\"  \n❌ \"Estoy consultando el sistema\"",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "dragabrielaautosulai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dragabrielaautosulai@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        192
+      ],
+      "id": "e737f122-6338-4030-8258-b8d4874e6b62",
+      "name": "Reagendamento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Nl9G13Rpr3DqBPB0",
+          "name": "Dra. Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "# USO DE ESTA TOOL — CANCELACIÓN DE CONSULTAS\n\nUtilizar esta tool para **cancelar consultas** del consultorio de Gabriela Olivera.\n\n---\n\n## PROCESO DE CANCELACIÓN\n\n### PASO 1 — LOCALIZAR CONSULTA\n- Siempre buscar el agendamiento del paciente usando el teléfono recibido como parámetro.\n\n- Si no se encuentra ningún agendamiento:  \n  \"No encontré ninguna consulta a tu nombre. ¿Querés que la busque por fecha o preferís agendar una nueva?\"\n\n- Si se encuentran uno o más agendamientos:\n  - Listar cada uno con:\n    - Fecha (DD/MM/AAAA)  \n    - Hora (HH:MM)  \n\nEjemplo:  \nConsulta — 18/08/2025 a las 15:00  \nConsulta — 18/08/2025 a las 16:00  \n\n- Mantener internamente el `event_id` de cada uno.\n\n---\n\n### PASO 2 — CONFIRMAR CANCELACIÓN\n- Pedir al paciente que indique cuál desea cancelar  \n- Convertir el horario al formato **HH:MM**  \n- Identificar exactamente el turno correspondiente  \n\n- Confirmar con el paciente:  \n\"[primer nombre del paciente], ¿confirmás cancelar tu consulta del DD/MM/AAAA a las HH:MM?\"\n\n- Asociar internamente:  \n`evento_escolhido_id = event_id correspondiente`\n\n---\n\n### PASO 3 — EJECUTAR CANCELACIÓN\n- Solo cancelar después de confirmación explícita  \n- Eliminar usando el `event_id` correcto  \n- Retornar `\"status\": \"cancelado\"`  \n\n---\n\n## RESPUESTA FINAL\n\"Tu consulta fue cancelada correctamente.  \nStatus: cancelado  \nSi querés, puedo ayudarte a agendar una nueva.\"\n\n---\n\n## REGLAS INVIOLABLES\n✅ Siempre localizar antes de cancelar  \n✅ Siempre confirmar con el paciente  \n✅ Usar el `event_id` correcto  \n✅ Cancelar solo con confirmación  \n\n❌ Nunca cancelar sin confirmación  \n❌ Nunca cancelar un turno incorrecto  \n❌ Nunca cancelar sin validar datos  \n\n---\n\n## OFRECER REAGENDAMIENTO\nDespués de cancelar:  \n\"¿Querés agendar una nueva consulta? Puedo mostrarte los horarios disponibles.\"\n\n---\n\n## CASOS ESPECIALES\n\n- **No se encuentra consulta:**  \n  \"No encontré ningún agendamiento. ¿Podés decirme cuándo creés que era?\"\n\n- **Duda del paciente:**  \n  \"No hay problema, podés confirmarlo más tarde. Tu consulta sigue agendada.\"\n\n---\n\n## REGLA DE COMUNICACIÓN\n- No explicar procesos internos  \n- No mencionar sistema ni validaciones  \n- Responder como una persona  \n\n✔ \"Encontré tu consulta:\"  \n❌ \"Busqué en el sistema y procesé los datos\"",
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "dragabrielaautosulai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dragabrielaautosulai@gmail.com"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        192
+      ],
+      "id": "20b56efd-bef4-4784-bff2-406b59ea599c",
+      "name": "deletar_evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Nl9G13Rpr3DqBPB0",
+          "name": "Dra. Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=##### ROL\nSos responsable de consultar la disponibilidad de horarios del consultorio de Gabriela Olivera, identificando únicamente los horarios **LIBRES** para agendar.\n\n---\n\n## PARÁMETROS DE ENTRADA\n- `data_normalizada` (obligatorio) — formato **DD/MM/AAAA**\n- `telefono` (opcional) — si está presente, activar **MODO PACIENTE**\n\n> Timezone: `\"America/Montevideo\"`\n\n---\n\n## REGLA CERO — FECHA NORMALIZADA\n- Si recibís `data_normalizada`, **no reinterpretar ni recalcular la fecha**.\n- Usar exactamente la fecha recibida, tal como llega.\n\n---\n\n## CORTE AUTOMÁTICO — FIN DE SEMANA\n- Si la fecha cae sábado o domingo:\n  - **No consultar el calendario**\n  - Responder:\n  \n  \"Ese día no hay atención. ¿Querés que te sugiera el próximo día disponible?\"\n\n---\n\n## PASO 1 — VALIDACIÓN DE DÍA\n- Verificar si es día hábil (lunes a viernes).\n- Solo continuar si es válido.\n\n---\n\n## PASO 2 — CONSULTA DE OCUPACIÓN\n- Consultar inmediatamente los eventos del día en el calendario.\n- Identificar horarios ocupados.\n- Si no hay eventos → considerar todos los horarios como disponibles.\n\n---\n\n## HORARIOS DE ATENCIÓN\n\n### Lunes a viernes:\n- de las 08:45 a las 11:00 y de las 15:00 a 20:15\n\n---\n\n## GENERACIÓN DE HORARIOS\n\n- Cada consulta dura **45 minutos**.\n\n\n### Ejemplos de bloques por día:\n08:45 / 09:30 / 10:15 / 15:00 / 15:45 / 16:30 / 17:15 / 18:00 / 18:45 / 19:30\n\n\n> ⚠️ Solo incluir un bloque si su hora de **inicio** está dentro del rango de atención del día.\n> No incluir horarios pasados.\n> No inventar horarios fuera del rango.\n\n---\n\n## REGLA DE CONFLICTO\n- Cualquier evento en el calendario bloquea completamente ese bloque horario.\n- No permitir superposición de ningún tipo.\n\n---\n\n## EVENTO DE DÍA COMPLETO\n- Un evento de día completo bloquea toda la agenda del día.\n\n---\n\n## CRITERIO DE RESPUESTA\n- Calcular: horarios posibles − horarios ocupados\n- Si hay al menos 1 horario libre → listar todos los disponibles\n- Si no hay disponibilidad:\n\n  \"Este día está completo. ¿Querés que te sugiera otro?\"\n\n---\n\n## FORMATO DE RESPUESTA\n- Lista simple, en orden creciente, mostrando solo la hora de inicio de cada bloque:\n\n08:45\n09:30\n10:15\n\n- No usar explicaciones\n- No mostrar procesos internos\n- No mencionar validaciones\n\n---\n\n## REGLA DE COMUNICACIÓN (CRÍTICA)\n- Responder solo con el resultado final.\n- No explicar cómo se calculó.\n- Prohibido decir:\n  - \"voy a verificar\"\n  - \"consulté el sistema\"\n  - \"procesé la fecha\"\n\n---\n\n## MODO PACIENTE (buscar por teléfono)\n\n### CUÁNDO USAR:\n- Si se recibe el parámetro `telefono`\n\n### OBJETIVO:\n- Encontrar turnos existentes del paciente\n\n### BÚSQUEDA:\n- Si hay fecha → buscar solo ese día\n- Si no hay fecha → buscar desde ayer hasta +60 días\n\n### FILTRO:\n- Eventos cuya descripción contenga el número de teléfono recibido\n\n### DATOS A CAPTURAR (internos):\n- event_id\n- fecha\n- hora\n- calendar_id\n\n### SALIDA INTERNA:\n```json\n{\n  \"eventos_paciente\": [\n    {\n      \"event_id\": \"abc123\",\n      \"fecha\": \"18/08/2025\",\n      \"hora\": \"15:00\"\n    }\n  ]\n}\n```",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "dragabrielaautosulai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dragabrielaautosulai@gmail.com"
+        },
+        "limit": "=300",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        192
+      ],
+      "id": "086550e7-45db-4678-b9fb-4773fdc54719",
+      "name": "listar_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Nl9G13Rpr3DqBPB0",
+          "name": "Dra. Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=## USO DE ESTA TOOL\nUtilizar esta tool **solo cuando el paciente ya confirmó explícitamente que desea agendar una consulta**.  \nSi no está confirmado, detener el flujo y solicitar confirmación antes de crear.\n\n---\n\n## PREVALIDACIONES OBLIGATORIAS\n- **Siempre** verificar disponibilidad antes de crear.  \n- **Siempre** confirmar que el horario esté libre.  \n- **Siempre** validar que sea día hábil (lunes a viernes).  \n- **Siempre** validar que el horario esté dentro del rango permitido según el día.  \n- **Siempre** confirmar explícitamente con el paciente **fecha y hora** antes de crear:\n\n1. Confirmar con el paciente:  \n   > \"Confirmo: consulta el día DD/MM/AAAA a las HH:MM. ¿Está correcto?\"\n\n2. Solo continuar después de confirmación afirmativa.\n\n3. Nunca programes citas durante las horas punta\n\n---\n\n## DURACIÓN Y LÍMITES (OBLIGATORIO)\n- Duración fija: **45 minutos**  \n- Timezone: `\"America/Montevideo\"`  \n\n---\n\n## HORARIOS PERMITIDOS\n\n### Lunes a viernes:\n- de las 08:45 a las 11:00 y de las 15:00 a 20:15  \n\n\n- No permitir horarios fuera de estos rangos  \n- No permitir horarios pasados  \n- Programe su cita únicamente dentro de los horarios disponibles.\n\n---\n\n## CONFLICTO\n- No permitir que el paciente elija un horario ocupado  \n- Antes de crear, validar que no haya superposición  \n- Si hay conflicto → **no crear**  \n\n---\n\n## INFORMACIÓN OBLIGATORIA EN EL EVENTO\n- **Summary:**  \n  `Nombre del paciente`\n  `Tipo de consulta`\n\n- **Descripción debe incluir:**\n  - Nombre del paciente (recibido como parámetro)\n  - Teléfono del paciente (recibido como parámetro, usar exactamente ese número)\n  - Tipo de atención (individual, pareja o familiar)  \n\n---\n\n## PROCESO DE CREACIÓN\n1. Validar día hábil  \n2. Consultar disponibilidad  \n3. Confirmar que el horario esté libre  \n4. Confirmar fecha y hora con el paciente  \n5. Confirmar datos  \n6. Crear evento  \n7. Retornar `\"status\": \"agendado\"`  \n\n---\n\n## REGLAS INVIOLABLES\n✅ Crear solo después de confirmación del paciente  \n✅ Crear solo si el horario está libre  \n✅ Incluir siempre el teléfono  \n✅ Retornar `\"status\": \"agendado\"`  \n\n❌ Nunca crear si el horario está ocupado  \n❌ Nunca crear sin confirmación explícita  \n❌ Nunca agendar fines de semana  \n❌ Nunca duplicar horarios  \n\n---\n\n## RESPUESTA DESPUÉS DE CREAR\n\"Listo, [primer nombre del paciente].  \nTu consulta quedó confirmada para el día [DD/MM/AAAA] a las [HH:MM].  \nBarrio Centro, Calle Paraguay Nº 390, Artigas (Entre Sarayva Y Oribe)\n\n---\n\n## TRATAMIENTO DE CONFLICTOS\nSi el horario ya no está disponible:\n\n\"Ese horario ya no está disponible. Te paso otras opciones para ese día.\"\n\n---\n\n## REGLA DE COMUNICACIÓN\n- No explicar procesos internos  \n- No mencionar validaciones ni sistema  \n- Responder siempre como una persona  \n\n✔ \"Tengo estos horarios disponibles:\"  \n❌ \"Verifiqué el sistema y procesé la información\"",
+        "calendar": {
+          "__rl": true,
+          "value": "dragabrielaautosulai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dragabrielaautosulai@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', `Coloque qual o nome do paciente, a data de nascimento, o telefone dele e o médico responsável da consulta. `, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `Coloque apenas o nome do paciente, a data e o horário de agendamento e o médico que fará a consulta.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        192
+      ],
+      "id": "c1e7c24c-8ac2-47c9-9fcd-82f3d08a967e",
+      "name": "criar_consulta",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Nl9G13Rpr3DqBPB0",
+          "name": "Dra. Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=## USO DE ESTA TOOL\nUtilizar esta tool **solo cuando el paciente ya confirmó explícitamente que desea agendar una consulta**.  \nSi no está confirmado, detener el flujo y solicitar confirmación antes de crear.\n\n---\n\n## PREVALIDACIONES OBLIGATORIAS\n- **Siempre** consultar disponibilidad antes de crear.  \n- **Siempre** confirmar que el horario esté libre.  \n- **Siempre** validar que sea día hábil (lunes a viernes).  \n- **Siempre** validar que el horario esté dentro de la disponibilidad del día.  \n- **Siempre** confirmar explícitamente con el paciente **fecha y hora** antes de crear:\n\n1. Repetir al paciente:  \n   > \"Confirmo: consulta el día DD/MM/AAAA a las HH:MM. ¿Está correcto?\"\n\n2. Solo continuar después de confirmación afirmativa.\n\n---\n\n## DURACIÓN Y REGLAS\n- Duración fija: **45 minutos**  \n- Timezone: `\"America/Montevideo\"`  \n\n---\n\n## HORARIOS PERMITIDOS\n\n### Lunes a viernes:\n- de las 08:45 a las 11:00 y de las 15:00 a 20:15 \n\n- No permitir horarios fuera de estos rangos  \n- No permitir horarios pasados  \n- Programe su cita únicamente dentro de los horarios disponibles\n\n---\n\n## CONFLICTOS\n- Nunca permitir elegir un horario ocupado  \n- Antes de crear, validar que no exista superposición  \n- Si hay conflicto → no crear  \n\n---\n\n## INFORMACIÓN OBLIGATORIA EN EL EVENTO\n- **Summary:**  \n  `Nombre del paciente`\n  `Tipo de consulta`\n\n- **Descripción debe incluir:**\n  - Nombre completo del paciente  \n  - Teléfono del paciente (recibido como parámetro)  \n  - Tipo de atención (individual, pareja o familiar)  \n\n---\n\n## PROCESO DE CREACIÓN\n1. Validar día hábil  \n2. Consultar disponibilidad  \n3. Confirmar que el horario esté libre  \n4. Confirmar fecha y hora con el paciente  \n5. Confirmar datos  \n6. Crear evento  \n7. Retornar `\"status\": \"agendado\"`  \n\n---\n\n## REGLAS INVIOLABLES\n✅ Crear solo después de confirmación del paciente  \n✅ Crear solo si el horario está libre  \n✅ Incluir siempre el teléfono  \n✅ Retornar `\"status\": \"agendado\"`  \n\n❌ Nunca crear si el horario está ocupado  \n❌ Nunca crear sin confirmación explícita  \n❌ Nunca agendar fines de semana  \n❌ Nunca duplicar horarios  \n\n---\n\n## RESPUESTA DESPUÉS DE CREAR\n\"Listo, [primer nombre del paciente].  \nTu consulta quedó confirmada para el día [DD/MM/AAAA] a las [HH:MM].  \nTe esperamos.\"\n\n---\n\n## TRATAMIENTO DE CONFLICTOS\nSi el horario ya no está disponible:\n\n\"Ese horario ya no está disponible. Te paso otras opciones para ese día.\"\n\n---\n\n## REGLA DE COMUNICACIÓN\n- No explicar procesos internos  \n- No mencionar validaciones ni sistema  \n- Responder siempre como una persona  \n\n✔ \"Tengo estos horarios disponibles:\"  \n❌ \"Verifiqué el sistema y procesé la información\"",
+        "calendar": {
+          "__rl": true,
+          "value": "dragabrielaautosulai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "dragabrielaautosulai@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', `Coloque qual o nome do paciente, a data de nascimento, o telefone dele (busque no RemotId) e o médico responsável da consulta.`, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `Coloque apenas o nome do paciente, a data e o horário de agendamento e o médico que fará a consulta.`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        192
+      ],
+      "id": "4441dcb0-f34e-40ed-b83a-0c7830d175a5",
+      "name": "criar_reconsulta",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "Nl9G13Rpr3DqBPB0",
+          "name": "Dra. Gabriela"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "path": "dra-gabriela-uruguai"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        992,
+        -48
+      ],
+      "id": "d463dd3d-10c3-4ae1-bf71-8c95945c5cf6",
+      "name": "MCP Server Trigger",
+      "webhookId": "b4862bec-4eaf-4811-8779-32c1b5031386"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use esta tool SEMPRE que criar uma nova consulta no Google Calendar.\n\nQUANDO USAR:\n- Imediatamente após executar a tool criar_consulta ou criar_reconsulta com sucesso.\n- Nunca usar antes de confirmar que o evento foi criado no Google Calendar.\n\nOBJETIVO:\nSalvar o registro da consulta no banco de dados do painel da clínica (Supabase), para que apareça na agenda do painel.\n\nCAMPOS OBRIGATÓRIOS:\n- id: usar EXATAMENTE o ID retornado pelo Google Calendar após criar o evento (campo \"id\" da resposta da tool criar_consulta ou criar_reconsulta)\n- titulo: nome do paciente + tipo de consulta. Ex: \"João Silva - Consulta Individual\"\n- inicio: data e hora de início no formato ISO 8601 com timezone. Ex: \"2025-08-18T14:00:00-03:00\"\n- fim: data e hora de fim no formato ISO 8601 com timezone. Ex: \"2025-08-18T14:50:00-03:00\"\n- telefone: telefone do paciente sem formatação. Ex: \"5551999990000\"\n- tipo: um dos valores: \"individual\", \"casal\" ou \"familiar\"\n- descricao: descrição completa do evento (mesmo texto da descrição do Google Calendar)\n- is_bloqueio: sempre false para consultas\n\nREGRAS INVIOLÁVEIS:\n✅ Sempre executar após criar_consulta ou criar_reconsulta\n✅ Sempre usar o ID real do Google Calendar (nunca inventar)\n✅ Sempre passar inicio e fim no formato ISO 8601 com timezone -03:00\n❌ Nunca executar sem o ID do Google Calendar em mãos\n❌ Nunca executar se a criação no Google Calendar falhou",
+        "tableId": "agendamentos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $fromAI('id','ID do evento retornado pelo Google Calendar após criação','string') }}"
+            },
+            {
+              "fieldId": "titulo",
+              "fieldValue": "={{ $fromAI('titulo','Nome do paciente e tipo de consulta','string') }}"
+            },
+            {
+              "fieldId": "inicio",
+              "fieldValue": "= {{ $fromAI('inicio','Data e hora de início ISO 8601 com timezone','string') }}"
+            },
+            {
+              "fieldId": "fim",
+              "fieldValue": "={{ $fromAI('fim','Data e hora de fim ISO 8601 com timezone','string') }}"
+            },
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{ $fromAI('telefone','Telefone do paciente','string') }}"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "={{ $fromAI('tipo','individual, casal ou familiar','string') }}"
+            },
+            {
+              "fieldId": "descricao",
+              "fieldValue": "={{ $fromAI('descricao','Descrição adicional','string') }}"
+            },
+            {
+              "fieldId": "is_bloqueio",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        192
+      ],
+      "id": "33f906c3-37c1-486a-9963-70c954f705e2",
+      "name": "supabase_criar_consulta",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UID84JBk3R78WVfc",
+          "name": "Dra Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use esta tool SEMPRE que criar uma reconsulta no Google Calendar.\n\nQUANDO USAR:\n- Imediatamente após executar a tool criar_reconsulta com sucesso.\n- Nunca usar antes de confirmar que o evento foi criado no Google Calendar.\n\nOBJETIVO:\nSalvar o registro da reconsulta no banco de dados do painel da clínica (Supabase), para que apareça na agenda do painel.\n\nCAMPOS OBRIGATÓRIOS:\n- id: usar EXATAMENTE o ID retornado pelo Google Calendar após criar a reconsulta (campo \"id\" da resposta)\n- titulo: nome do paciente + tipo. Ex: \"João Silva - Reconsulta Individual\"\n- inicio: data e hora de início ISO 8601 com timezone. Ex: \"2025-08-18T14:00:00-03:00\"\n- fim: data e hora de fim ISO 8601 com timezone. Ex: \"2025-08-18T14:50:00-03:00\"\n- telefone: telefone do paciente sem formatação\n- tipo: um dos valores: \"individual\", \"casal\" ou \"familiar\"\n- descricao: descrição completa do evento\n- is_bloqueio: sempre false\n\nREGRAS INVIOLÁVEIS:\n✅ Sempre executar após criar_reconsulta\n✅ Sempre usar o ID real do Google Calendar\n✅ Sempre passar inicio e fim no formato ISO 8601 com timezone -03:00\n❌ Nunca executar sem o ID do Google Calendar em mãos\n❌ Nunca executar se a criação no Google Calendar falhou",
+        "tableId": "agendamentos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $fromAI('id','ID do evento retornado pelo Google Calendar após criação','string') }}"
+            },
+            {
+              "fieldId": "titulo",
+              "fieldValue": "={{ $fromAI('titulo','Nome do paciente e tipo de consulta','string') }}"
+            },
+            {
+              "fieldId": "inicio",
+              "fieldValue": "= {{ $fromAI('inicio','Data e hora de início ISO 8601 com timezone','string') }}"
+            },
+            {
+              "fieldId": "fim",
+              "fieldValue": "={{ $fromAI('fim','Data e hora de fim ISO 8601 com timezone','string') }}"
+            },
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{ $fromAI('telefone','Telefone do paciente','string') }}"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "={{ $fromAI('tipo','individual, casal ou familiar','string') }}"
+            },
+            {
+              "fieldId": "descricao",
+              "fieldValue": "={{ $fromAI('descricao','Descrição adicional','string') }}"
+            },
+            {
+              "fieldId": "is_bloqueio",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        192
+      ],
+      "id": "50dfb256-e8ca-4735-9366-8b8a92e03fd1",
+      "name": "supabase_criar_reconsulta",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UID84JBk3R78WVfc",
+          "name": "Dra Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use esta tool SEMPRE que reagendar uma consulta no Google Calendar.\n\nQUANDO USAR:\n- Imediatamente após executar a tool Reagendamento com sucesso no Google Calendar.\n- O reagendamento no Google Calendar atualiza o evento existente mantendo o mesmo ID.\n\nOBJETIVO:\nAtualizar o horário da consulta no banco de dados do painel da clínica (Supabase), para que a agenda do painel reflita o novo horário.\n\nCAMPOS OBRIGATÓRIOS:\n- event_id: o ID do evento do Google Calendar que foi reagendado (o mesmo ID usado na tool Reagendamento)\n- novo_inicio: nova data e hora de início ISO 8601 com timezone. Ex: \"2025-08-20T15:00:00-03:00\"\n- novo_fim: nova data e hora de fim ISO 8601 com timezone. Ex: \"2025-08-20T15:50:00-03:00\"\n\nREGRAS INVIOLÁVEIS:\n✅ Sempre executar após a tool Reagendamento confirmar sucesso\n✅ Usar o mesmo event_id que foi passado para a tool Reagendamento\n✅ Passar novo_inicio e novo_fim no formato ISO 8601 com timezone -03:00\n❌ Nunca atualizar sem ter o event_id correto\n❌ Nunca executar se o reagendamento no Google Calendar falhou",
+        "operation": "update",
+        "tableId": "agendamentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('event_id','ID do evento a reagendar','string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "inicio",
+              "fieldValue": "= {{ $fromAI('inicio','Data e hora de início ISO 8601 com timezone','string') }}"
+            },
+            {
+              "fieldId": "fim",
+              "fieldValue": "={{ $fromAI('fim','Data e hora de fim ISO 8601 com timezone','string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        192
+      ],
+      "id": "3d835fc9-a29a-4355-bb9a-7937f90d4e31",
+      "name": "supabase_reagendar_consulta",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UID84JBk3R78WVfc",
+          "name": "Dra Gabriela"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use esta tool SEMPRE que cancelar ou deletar uma consulta no Google Calendar.\n\nQUANDO USAR:\n- Imediatamente após executar a tool deletar_evento com sucesso no Google Calendar.\n- Também usar quando o reagendamento exige deletar o evento antigo (antes de criar o novo).\n\nOBJETIVO:\nRemover o registro da consulta do banco de dados do painel da clínica (Supabase), para que o evento desapareça da agenda do painel.\n\nCAMPOS OBRIGATÓRIOS:\n- event_id: o ID exato do evento do Google Calendar que foi deletado (o mesmo ID passado para deletar_evento)\n\nREGRAS INVIOLÁVEIS:\n✅ Sempre executar após deletar_evento confirmar sucesso\n✅ Usar o mesmo event_id que foi passado para deletar_evento\n❌ Nunca deletar sem ter o event_id correto\n❌ Nunca executar se a deleção no Google Calendar falhou\n❌ Nunca executar se o paciente não confirmou o cancelamento",
+        "operation": "delete",
+        "tableId": "agendamentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('event_id','ID do evento a deletar','string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        192
+      ],
+      "id": "e33eeb97-c0d5-4296-9f66-e06c231f04bf",
+      "name": "supabase_deletar_consulta",
+      "credentials": {
+        "supabaseApi": {
+          "id": "UID84JBk3R78WVfc",
+          "name": "Dra Gabriela"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think2": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reagendamento": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "deletar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listar_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar_consulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar_reconsulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "supabase_criar_consulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "supabase_criar_reconsulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "supabase_reagendar_consulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "supabase_deletar_consulta": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timezone": "America/Sao_Paulo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "719902c6-16cf-472d-aefe-926218e71e34",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20121183c73c930b96c2957f692b4fe98e5034b7c0f6533053109b77a4980a9b"
+  },
+  "nodeGroups": [],
+  "id": "YlArXQOPfJoGwwgz",
+  "tags": []
+}

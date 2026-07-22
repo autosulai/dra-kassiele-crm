@@ -1,0 +1,93 @@
+{
+  "name": "[KASSIELE] AUTOMACAO 1 - FOLLOWUP E REPESCAGEM DIARIA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "id": "cron-09h",
+      "name": "Cron 09h Diário"
+    },
+    {
+      "parameters": {
+        "operation": "rpc",
+        "functionName": "fn_fila_followup"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "id": "rpc-fila",
+      "name": "Buscar Fila de Follow-up",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "instanceName": "Kassiele Advocacia",
+        "remoteJid": "={{ $json.telefone }}@s.whatsapp.net",
+        "messageText": "={{ $json.mensagem }}"
+      },
+      "type": "n8n-nodes-base.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "id": "send-followup",
+      "name": "Enviar Cobrança de Laudos",
+      "credentials": {
+        "evolutionApi": {
+          "id": "CRED_EVOLUTION_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron 09h Diário": {
+      "main": [
+        [
+          {
+            "node": "Buscar Fila de Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Fila de Follow-up": {
+      "main": [
+        [
+          {
+            "node": "Enviar Cobrança de Laudos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "name": "[KASSIELE] AUTOMACAO 2 - LEMBRETE DE PERICIA INSS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
+      "id": "cron-08h",
+      "name": "Cron 08h Diário"
+    },
+    {
+      "parameters": {
+        "operation": "rpc",
+        "functionName": "fn_fila_lembretes_evento"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "id": "rpc-lembrete",
+      "name": "Buscar Perícias em 2 Dias",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CRED_SUPABASE_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "instanceName": "Kassiele Advocacia",
+        "remoteJid": "={{ $json.telefone }}@s.whatsapp.net",
+        "messageText": "=⚠️ *Atenção, {{ $json.nome }}! Lembrete da Dra. Kassiele:*\n\nSua **Perícia Médica no INSS** está agendada para: **{{ $json.data_hora }}** na **{{ $json.local_detalhe }}**.\n\n📌 **ORIENTAÇÕES OBRIGATÓRIAS:**\n1. Chegue com no mínimo 30 minutos de antecedência.\n2. Leve **TODOS OS SEUS LAUDOS MÉDICOS, ATESTADOS E RECEITAS ORIGINAIS** em mãos.\n3. Leve RG, CPF e Carteira de Trabalho originais."
+      },
+      "type": "n8n-nodes-base.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ],
+      "id": "send-pericia",
+      "name": "Enviar Lembrete de Perícia",
+      "credentials": {
+        "evolutionApi": {
+          "id": "CRED_EVOLUTION_ID",
+          "name": "Kassiele Advocacia"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron 08h Diário": {
+      "main": [
+        [
+          {
+            "node": "Buscar Perícias em 2 Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Perícias em 2 Dias": {
+      "main": [
+        [
+          {
+            "node": "Enviar Lembrete de Perícia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo"
+  }
+}
