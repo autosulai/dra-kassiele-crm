@@ -332,6 +332,7 @@ export const Funil = ({ onGoToChat }) => {
                 key={f.slug}
                 className={`cj-fn-tab ${funil?.slug === f.slug ? 'active' : ''} cor-${f.cor}`}
                 onClick={() => setFunilAtivo(f.slug)}
+                disabled={modoEdicao}
               >
                 {f.nome}
                 <span className="cj-fn-tab-n">
