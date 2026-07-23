@@ -7,7 +7,6 @@ export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
   const esc = escritorioState || escritorio;
   const items = [
     { id: 'funil', label: 'Funil', icon: 'funnel' },
-    { id: 'chat', label: 'Chat', icon: 'bell' },
     { id: 'prazos', label: 'Prazos & Perícias', icon: 'calendar' },
     { id: 'clientes', label: 'Clientes', icon: 'users' },
     { id: 'casos', label: 'Processos', icon: 'folder' },
@@ -43,7 +42,7 @@ export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
       </button>
 
       <button className="cj-new" onClick={() => abrirConversas()} style={{ background: 'var(--ok, #10b981)', marginTop: '8px' }}>
-        <Icon name="external" size={15}/> Abrir Conversas
+        <Icon name="whatsapp" size={15}/> Abrir Conversas
       </button>
 
       <nav className="cj-nav">
