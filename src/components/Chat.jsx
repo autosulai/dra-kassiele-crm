@@ -274,6 +274,13 @@ export const Chat = ({
     flash('Dados do lead salvos com sucesso');
   };
 
+  // ─── Abrir Chatwoot em nova guia (chat fora do CRM) ───────────────────────
+  const abrirConversas = () => {
+    if (!chatwootUrl) { flash('Configure a URL do Chatwoot em Configurações → Integrações'); return; }
+    window.open(chatwootUrl, 'chatwoot_inbox', 'noopener,noreferrer');
+    flash('Abrindo a caixa de entrada do Chatwoot em nova guia…');
+  };
+
   // ─── Solicitar contexto do Chatwoot (pedir dados da conversa ativa) ───────
   const requestChatwootContext = () => {
     const iframe = document.querySelector('iframe[title="Chatwoot"]');
@@ -337,13 +344,27 @@ export const Chat = ({
           </div>
         </header>
 
-        {/* Iframe do Chatwoot ou Placeholder */}
+        {/* Launcher: abre o Chatwoot em nova guia (chat fora do CRM) */}
         {isChatwootConfigured ? (
-          <iframe
-            src={chatwootUrl}
-            style={{ flex: 1, width: '100%', border: 'none' }}
-            title="Chatwoot"
-          />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', textAlign: 'center', background: 'var(--bg)' }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '22px', background: 'rgba(16,185,129,0.10)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '22px' }}>
+              <Icon name="external" size={34}/>
+            </div>
+            <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--ink)', margin: '0 0 10px 0' }}>Central de Atendimento</h3>
+            <p style={{ fontSize: '13px', color: 'var(--ink-3)', maxWidth: '440px', lineHeight: '1.6', margin: '0 0 26px 0' }}>
+              As conversas ao vivo abrem em uma janela dedicada do Chatwoot (áudio, anexos, notas internas e respostas rápidas). O painel do cliente à direita continua sincronizado com o CRM pelo telefone.
+            </p>
+            <button
+              className="cj-btn accent"
+              onClick={abrirConversas}
+              style={{ fontSize: '15px', padding: '12px 28px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            >
+              <Icon name="external" size={16}/> Abrir Conversas
+            </button>
+            <p style={{ fontSize: '11px', color: 'var(--ink-4)', marginTop: '18px' }}>
+              Abre a caixa de entrada configurada em uma nova guia do navegador.
+            </p>
+          </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', textAlign: 'center', background: 'var(--bg)' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
@@ -351,14 +372,11 @@ export const Chat = ({
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--ink)', margin: '0 0 10px 0' }}>Configure o Chatwoot</h3>
             <p style={{ fontSize: '13px', color: 'var(--ink-3)', maxWidth: '460px', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              Para ativar o atendimento ao vivo integrado, vá em <b>Configurações → Integrações</b> e insira a URL da sua instância self-hosted do Chatwoot, o Token de acesso e o ID da conta.
+              Vá em <b>Configurações → Integrações</b> e insira a URL da caixa de entrada do seu Chatwoot self-hosted, o Token de acesso e o ID da conta.
             </p>
             <button className="cj-btn" onClick={() => flash('Abra a aba Configurações → Integrações para inserir a URL do Chatwoot')}>
               <Icon name="sparkles" size={14}/> Ir para Configurações
             </button>
-            <p style={{ fontSize: '11px', color: 'var(--ink-4)', marginTop: '20px' }}>
-              💡 Precisa ser uma instância <b>self-hosted</b> para funcionar embutida aqui (o cloud público bloqueia iframe).
-            </p>
           </div>
         )}
       </section>

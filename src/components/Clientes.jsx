@@ -6,6 +6,7 @@ import { ModalNovaTag } from './ModalNovaTag';
 import { supabase } from '../lib/supabase';
 import { loadEventos } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
+import { abrirConversaChatwoot } from '../lib/chatwootService';
 
 export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag }) => {
   const [q, setQ] = useState('');
@@ -434,6 +435,7 @@ function ClienteDetalhe({
         <div className="cj-cli-det-actions">
           <button className="cj-btn ghost"><Icon name="phone" size={13}/> Ligar</button>
           <button className="cj-btn ghost"><Icon name="mail" size={13}/> E-mail</button>
+          <button className="cj-btn ghost" onClick={() => abrirConversaChatwoot(cliente.tel || cliente.telefone, flash)} title="Abrir a conversa deste cliente no Chatwoot"><Icon name="external" size={13}/> Chatwoot</button>
           <button className="cj-btn" onClick={() => onEdit()}><Icon name="calendar" size={13}/> Prazos & Perícias</button>
         </div>
       </header>

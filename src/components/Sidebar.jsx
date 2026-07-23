@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Icon } from './Icon';
 import { escritorio } from '../data/mockData';
+import { abrirConversas } from '../lib/chatwootService';
 
 export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
   const esc = escritorioState || escritorio;
@@ -39,6 +40,10 @@ export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
 
       <button className="cj-new" onClick={onNew}>
         <Icon name="plus" size={15}/> Registrar prazo
+      </button>
+
+      <button className="cj-new" onClick={() => abrirConversas()} style={{ background: 'var(--ok, #10b981)', marginTop: '8px' }}>
+        <Icon name="external" size={15}/> Abrir Conversas
       </button>
 
       <nav className="cj-nav">
