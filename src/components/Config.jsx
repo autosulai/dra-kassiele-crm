@@ -507,12 +507,7 @@ function CfgAdvogados({ flash, escritorioState, onUpdateEscritorio }) {
       const salvas = localStorage.getItem('cj_acessos_painel');
       if (salvas) return JSON.parse(salvas);
     } catch(e){}
-    return [
-      { n: 'Helena Prado', e: 'helena@sulassociados.adv.br', r: 'Administrador' },
-      { n: 'Rafael Motta', e: 'rafael@sulassociados.adv.br', r: 'Advogado' },
-      { n: 'Camila Reis', e: 'camila@sulassociados.adv.br', r: 'Advogado' },
-      { n: 'Recepção', e: 'recepcao@sulassociados.adv.br', r: 'Secretaria' },
-    ];
+    return [];
   });
   const [modalAdv, setModalAdv] = useState(null);
   const [modalAcesso, setModalAcesso] = useState(null);

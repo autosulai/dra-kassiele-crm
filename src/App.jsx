@@ -10,6 +10,7 @@ import { Dashboard } from './components/Dashboard';
 import { clientes, escritorio, casos, configIA, TAGS_DISPONIVEIS } from './data/mockData';
 import { supabase } from './lib/supabase';
 import { loadAllCRMData } from './lib/supabaseService';
+import { abrirConversas, abrirConversaChatwoot } from './lib/chatwootService';
 
 export function App() {
   const [view, setView] = useState(() => localStorage.getItem('cj_view') || 'funil');
@@ -18,6 +19,7 @@ export function App() {
   const [clientesList, setClientesList] = useState(clientes);
   const [casosList, setCasosList] = useState(casos);
   const [tagsLista, setTagsLista] = useState(TAGS_DISPONIVEIS);
+  const [autoOpenNovaPrazo, setAutoOpenNovaPrazo] = useState(false);
 
   const handleAddTag = (novaTag) => {
     if (!TAGS_DISPONIVEIS.some(t => t.id === novaTag.id)) {
@@ -142,8 +144,13 @@ export function App() {
   const [crmTarget, setCrmTarget] = useState(null);
   const [prazosTarget, setPrazosTarget] = useState(null);
 
-  const handleGoToChat = () => {
-    setView('chat');
+  const handleGoToChat = (leadOrClient) => {
+    const tel = leadOrClient?.telefone || leadOrClient?.tel;
+    if (tel) {
+      abrirConversaChatwoot(tel, (msg) => console.log('Chatwoot:', msg));
+    } else {
+      abrirConversas((msg) => console.log('Chatwoot:', msg));
+    }
   };
 
   const handleGoToCRM = (target) => {
@@ -176,7 +183,7 @@ export function App() {
 
   return (
     <div className="cj-app">
-      <Sidebar view={view} setView={setView} onNew={() => setView('prazos')} escritorioState={escritorioState}/>
+      <Sidebar view={view} setView={setView} onNew={() => { setView('prazos'); setAutoOpenNovaPrazo(true); }} escritorioState={escritorioState}/>
       <main className="cj-main">
         {view === 'dashboard' && (
           <Dashboard
@@ -197,6 +204,8 @@ export function App() {
             casosList={casosList} 
             advogados={escritorioState?.advogados || []}
             targetClient={prazosTarget}
+            autoOpenNew={autoOpenNovaPrazo}
+            onAutoOpenEnd={() => setAutoOpenNovaPrazo(false)}
           />
         )}
         {view === 'chat' && (

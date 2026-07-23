@@ -50,13 +50,20 @@ const SECOES = [
 
 // ---------------------------------------------------------------------------
 
-export const Prazos = ({ clientesList = [], casosList = [], advogados = [], targetClient }) => {
+export const Prazos = ({ clientesList = [], casosList = [], advogados = [], targetClient, autoOpenNew, onAutoOpenEnd }) => {
   const [eventos, setEventos] = useState([]);
   const [tipos, setTipos] = useState([]);
   const [filtroTipo, setFiltroTipo] = useState('todos');
   const [abaPer, setAbaPer] = useState('todos');
   const [editor, setEditor] = useState(null);
   const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    if (autoOpenNew) {
+      setEditor({});
+      if (onAutoOpenEnd) onAutoOpenEnd();
+    }
+  }, [autoOpenNew, onAutoOpenEnd]);
 
   useEffect(() => {
     if (targetClient && targetClient.id) {

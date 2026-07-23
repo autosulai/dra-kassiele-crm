@@ -64,13 +64,7 @@ export const configIA = {
   max_mensagens_sem_avanco: 6,
   valorConsulta: 'Gratuito (Análise Previdenciária)',
   areas: ['Previdenciário', 'BPC-LOAS', 'Auxílio Doença'],
-  conhecimento: [
-    { id: 'k1', tipo: 'texto', t: 'Horário de funcionamento e atendimento humanizado', v: 'Segunda a sexta das 09:00 às 18:00. Fora desse horário a Sofia continua atendendo e coletando laudos no WhatsApp; a Dra. Kassiele retorna no próximo dia útil.' },
-    { id: 'k2', tipo: 'doc', t: 'Checklist Documentação BPC-LOAS (Deficiência e Idoso 65+)', v: 'CadÚnico atualizado (últimos 24 meses), Laudo ou relatório médico/escolar (mesmo antigo), RG, CPF e comprovante de residência.', arquivo: { nome: 'Checklist_BPC_LOAS_Kassiele.pdf', tamanho: '950 KB', paginas: 3, status: 'indexado', data: '18/07/2026' } },
-    { id: 'k3', tipo: 'doc', t: 'Checklist Documentação Auxílio Doença / Incapacidade', v: 'Laudo médico com CID (atual ou antigo), Atestados, CNIS (via Meu INSS) ou Carteira de Trabalho, comprovantes de recolhimento MEI/autônomo, RG e CPF.', arquivo: { nome: 'Checklist_Auxilio_Doenca_INSS.pdf', tamanho: '810 KB', paginas: 3, status: 'indexado', data: '18/07/2026' } },
-    { id: 'k4', tipo: 'texto', t: 'Política de Cobrança Transparente (30% no Êxito)', v: 'O escritório trabalha no modelo ad exitum: honorários contratuais de 30% cobrados exclusivamente no final do processo após a concessão e êxito do benefício previdenciário. Zero cobrança antecipada para iniciar a análise.' },
-    { id: 'k5', tipo: 'texto', t: 'Garantia Anti-Fraude, OAB e Assinatura Digital D4Sign', v: 'Dra. Kassiele devidamente inscrita na OAB/RS 88.412. Escritório não solicita transferências Pix para liberação de alvarás ou perícias. Formalização de contratos ágil e segura via plataforma D4Sign no WhatsApp.' },
-  ],
+  conhecimento: [],
 };
 
 // Helpers de formatação e busca de estilos
