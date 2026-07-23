@@ -189,7 +189,7 @@ export async function loadAllCRMData() {
             : 'Hoje',
           origem: cl.origem || 'WhatsApp · Evolution'
         }))
-      : [...mockClientes];
+      : [];
 
     // --- Processos -----------------------------------------------------------
     const { data: procDb } = await supabase
@@ -211,7 +211,7 @@ export async function loadAllCRMData() {
           proximoPrazo: p.proximo_prazo || null,
           notas: p.notas || ''
         }))
-      : [...mockCasos];
+      : [];
 
     const { clientesFinal, casosFinal } = await mesclarLeadsAosClientes(clientesFormatted, casosFormatted);
 

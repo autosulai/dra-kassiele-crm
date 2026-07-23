@@ -13,8 +13,6 @@ export const Config = ({ escritorioState, onUpdateEscritorio, aiName, onUpdateIA
     { id: 'ia', label: 'Agente IA', icon: 'bell' },
     { id: 'advogados', label: 'Advogados', icon: 'users' },
     { id: 'tipos', label: 'Catálogo de Serviços', icon: 'calendar' },
-    { id: 'whatsapp', label: 'WhatsApp', icon: 'phone' },
-    { id: 'integracoes', label: 'Integrações / Chatwoot', icon: 'sparkles' },
   ];
   return (
     <div className="cj-config">
@@ -37,8 +35,6 @@ export const Config = ({ escritorioState, onUpdateEscritorio, aiName, onUpdateIA
           {tab === 'ia' && <CfgIA flash={flash} escritorioState={escritorioState} onUpdateIA={onUpdateIA} aiName={aiName}/>}
           {tab === 'advogados' && <CfgAdvogados flash={flash} escritorioState={escritorioState} onUpdateEscritorio={onUpdateEscritorio}/>}
           {tab === 'tipos' && <CfgTipos flash={flash}/>}
-          {tab === 'whatsapp' && <CfgWhatsApp flash={flash}/>}
-          {tab === 'integracoes' && <CfgIntegracoes flash={flash} onUpdateEscritorio={onUpdateEscritorio} escritorioState={escritorioState}/>}
         </div>
       </div>
       {toast && <div className="cj-toast"><Icon name="check" size={14}/> {toast}</div>}
