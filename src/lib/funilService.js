@@ -504,12 +504,6 @@ export async function adicionarLeadKanban(dados) {
     }]).select('id').single();
 
     if (error) throw error;
-    
-    // Inserir no histórico
-    await supabase.from('historico_etapas_lead').insert([{
-      lead_id: data.id,
-      etapa_nova: novoLead.etapa_slug
-    }]);
 
     return { ok: true, id: data.id, ...novoLead };
   } catch (err) {
