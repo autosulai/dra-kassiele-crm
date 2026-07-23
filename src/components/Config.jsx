@@ -188,20 +188,22 @@ function CfgIA({ flash, escritorioState, onUpdateIA, aiName }) {
     <div className="cj-cfg-stack">
       <section className="cj-card">
         <div className="cj-card-head"><h3>Identidade do agente</h3><span className="cj-mini ok"><span className="cj-livedot"/> ativo</span></div>
-        <div className="cj-field">
-          <label>Nome do agente</label>
-          <input type="text" value={nome} onChange={e => setNome(e.target.value)}/>
-        </div>
-        <div className="cj-field">
-          <label>Tom de voz</label>
-          <div className="cj-seg">
-            {[['formal','Formal'],['profissional','Profissional'],['proximo','Próximo']].map(([id,l]) => (
-              <button key={id} className={tom === id ? 'active' : ''} onClick={() => setTom(id)}>{l}</button>
-            ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="cj-field">
+            <label>Nome do agente</label>
+            <input type="text" value={nome} onChange={e => setNome(e.target.value)}/>
           </div>
-        </div>
-        <div className="cj-preview">
-          <div className="cj-preview-bubble">Olá! 👋 Aqui é a {nome}, assistente do {esc.nome}. {tom === 'formal' ? 'Em que posso auxiliá-lo?' : tom === 'proximo' ? 'Como posso te ajudar hoje?' : 'Como posso ajudar com sua questão jurídica?'}</div>
+          <div className="cj-field">
+            <label>Tom de voz</label>
+            <div className="cj-seg">
+              {[['formal','Formal'],['profissional','Profissional'],['proximo','Próximo']].map(([id,l]) => (
+                <button key={id} className={tom === id ? 'active' : ''} onClick={() => setTom(id)}>{l}</button>
+              ))}
+            </div>
+          </div>
+          <div className="cj-preview">
+            <div className="cj-preview-bubble">Olá! 👋 Aqui é a {nome}, assistente do {esc.nome}. {tom === 'formal' ? 'Em que posso auxiliá-lo?' : tom === 'proximo' ? 'Como posso te ajudar hoje?' : 'Como posso ajudar com sua questão jurídica?'}</div>
+          </div>
         </div>
         <div className="cj-card-actions"><button className="cj-btn" onClick={salvarIdentidade}>Salvar identidade</button></div>
       </section>
