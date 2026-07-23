@@ -316,21 +316,23 @@ export const Funil = ({ onGoToChat }) => {
   return (
     <div className="cj-fn">
       {/* ---------------- Cabeçalho ---------------- */}
-      <header className="cj-fn-head">
-        <div>
-          <h1 className="cj-fn-title">
-            <Icon name="funnel" size={20}/> Funil de Atendimento
-          </h1>
-          <p className="cj-fn-sub">
-            {leadsFiltrados.length} leads em aberto
-            {totalAtrasados > 0 && (
-              <> · <b className="cj-fn-alerta">{totalAtrasados} fora do prazo</b></>
-            )}
-          </p>
-        </div>
+      <header className="cj-fn-head" style={{ flexDirection: 'column', gap: 16, alignItems: 'stretch' }}>
+        
+        {/* Linha 1: Título e Filtro de Funis */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 20, flexWrap: 'wrap' }}>
+          <div style={{ flexShrink: 0 }}>
+            <h1 className="cj-fn-title" style={{ whiteSpace: 'nowrap' }}>
+              <Icon name="funnel" size={20}/> Funil de Atendimento
+            </h1>
+            <p className="cj-fn-sub">
+              {leadsFiltrados.length} leads em aberto
+              {totalAtrasados > 0 && (
+                <> · <b className="cj-fn-alerta">{totalAtrasados} fora do prazo</b></>
+              )}
+            </p>
+          </div>
 
-        <div className="cj-fn-tools">
-          <div className="cj-fn-tabs">
+          <div className="cj-fn-tabs" style={{ flexWrap: 'wrap' }}>
             {funis.map(f => (
               <button
                 key={f.slug}
@@ -345,8 +347,11 @@ export const Funil = ({ onGoToChat }) => {
               </button>
             ))}
           </div>
+        </div>
 
-          <div className="cj-fn-search">
+        {/* Linha 2: Busca e Botões */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div className="cj-fn-search" style={{ flex: 1, minWidth: 260, maxWidth: 400 }}>
             <Icon name="search" size={14}/>
             <input
               placeholder="Buscar por nome, telefone ou CPF"
@@ -355,30 +360,32 @@ export const Funil = ({ onGoToChat }) => {
             />
           </div>
 
-          <button
-            className={`cj-fn-filtro ${soAtrasados ? 'active' : ''}`}
-            onClick={() => setSoAtrasados(v => !v)}
-            title="Mostrar apenas quem estourou o prazo da etapa"
-          >
-            <Icon name="clock" size={14}/> Fora do prazo
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <button
+              className={`cj-fn-filtro ${soAtrasados ? 'active' : ''}`}
+              onClick={() => setSoAtrasados(v => !v)}
+              title="Mostrar apenas quem estourou o prazo da etapa"
+            >
+              <Icon name="clock" size={14}/> Fora do prazo
+            </button>
 
-          <button
-            className="cj-fn-btn-primario"
-            onClick={() => setModalNovoLead(true)}
-            style={{ padding: '0 12px', height: 32, fontSize: 13, gap: 6 }}
-          >
-            <Icon name="plus" size={14}/> Novo Lead
-          </button>
+            <button
+              className="cj-fn-btn-primario"
+              onClick={() => setModalNovoLead(true)}
+              style={{ padding: '0 14px', height: 32, fontSize: 13, gap: 6 }}
+            >
+              <Icon name="plus" size={14}/> Novo Lead
+            </button>
 
-          <button
-            className={`cj-fn-filtro ${modoEdicao ? 'active' : ''}`}
-            onClick={() => { if (modoEdicao) cancelarEdicao(); else iniciarEdicao(); }}
-            title="Adicionar, remover, editar títulos, prazos e reordenar as colunas do Kanban"
-            style={modoEdicao ? { background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' } : {}}
-          >
-            <Icon name="settings" size={14}/> {modoEdicao ? 'Sair da Edição' : 'Editar Kanban'}
-          </button>
+            <button
+              className={`cj-fn-filtro ${modoEdicao ? 'active' : ''}`}
+              onClick={() => { if (modoEdicao) cancelarEdicao(); else iniciarEdicao(); }}
+              title="Adicionar, remover, editar títulos, prazos e reordenar as colunas do Kanban"
+              style={modoEdicao ? { background: 'var(--primary)', color: '#fff', borderColor: 'var(--primary)' } : {}}
+            >
+              <Icon name="settings" size={14}/> {modoEdicao ? 'Sair da Edição' : 'Editar Kanban'}
+            </button>
+          </div>
         </div>
       </header>
 
