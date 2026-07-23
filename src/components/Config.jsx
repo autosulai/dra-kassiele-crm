@@ -239,14 +239,14 @@ function CfgIA({ flash, escritorioState, onUpdateIA, aiName }) {
       <section className="cj-card">
         <div className="cj-card-head">
           <div>
-            <h3>Ajustes Finos & Diretrizes (Prompt do Sistema)</h3>
-            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Enviado dinamicamente para o fluxo da Sofia no n8n · Limite de 3.000 caracteres</span>
+            <h3>Ajustes Finos & Diretrizes</h3>
+            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Regras específicas de atendimento · Limite de 3.000 caracteres</span>
           </div>
           <button className="cj-btn ghost sm" onClick={() => { const lim = (configIA.prompt || '').slice(0, 3000); setPrompt(lim); flash('Prompt restaurado'); }}>
             Restaurar
           </button>
         </div>
-        <p className="cj-card-p">Escreva aqui as diretrizes adicionais, regras ou ajustes finos que a advogada deseja acrescentar ao comportamento da Sofia no WhatsApp. Estas instruções são incorporadas automaticamente ao final do Prompt Principal no n8n em cada conversa.</p>
+        <p className="cj-card-p">Escreva aqui as diretrizes adicionais, regras ou ajustes finos que a advogada deseja acrescentar ao comportamento da IA no WhatsApp.</p>
         <textarea
           className="cj-prompt"
           value={prompt || ''}
@@ -266,8 +266,8 @@ function CfgIA({ flash, escritorioState, onUpdateIA, aiName }) {
       <section className="cj-card">
         <div className="cj-card-head">
           <div>
-            <h3>Base de conhecimento (RAG & Inteligência IA)</h3>
-            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Documentos, PDFs e instruções indexadas para busca rápida pela {nome || configIA.nome || 'Sofia'}</span>
+            <h3>Base de Conhecimento da IA</h3>
+            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Documentos, PDFs e instruções para consulta rápida da IA nos atendimentos</span>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <button className="cj-btn ghost sm" onClick={() => setModal({ novo: true, valores: { id: 'k' + Date.now(), tipo: 'texto', t: '', v: '' } })}>
@@ -285,7 +285,7 @@ function CfgIA({ flash, escritorioState, onUpdateIA, aiName }) {
                 <b>
                   <Icon name={k.tipo === 'doc' ? 'doc' : 'folder'} size={14}/>
                   <span>{k.t || 'Sem título'}</span>
-                  <span className="cj-know-badge">{k.tipo === 'doc' ? '📄 PDF/DOC · RAG' : '📝 Instrução'}</span>
+                  <span className="cj-know-badge">{k.tipo === 'doc' ? '📄 PDF/DOC' : '📝 Instrução'}</span>
                 </b>
                 <span>{k.v}</span>
                 {k.arquivo && (
@@ -293,7 +293,7 @@ function CfgIA({ flash, escritorioState, onUpdateIA, aiName }) {
                     <Icon name="doc" size={13}/>
                     <span>{k.arquivo.nome}</span>
                     <em>({k.arquivo.tamanho || '1.2 MB'} · {k.arquivo.paginas || 5} págs)</em>
-                    <span className="cj-chattag ok" style={{ marginLeft: 'auto' }}>✓ {k.arquivo.status || 'Indexado no pgvector'}</span>
+                    <span className="cj-chattag ok" style={{ marginLeft: 'auto' }}>✓ {k.arquivo.status || 'Pronto para uso'}</span>
                   </div>
                 )}
               </div>
@@ -381,7 +381,7 @@ function ModalConhecimento({ item, isNovo, onClose, onSalvar, onExcluir }) {
       <div className="cj-modal" onClick={e => e.stopPropagation()} style={{ width: 'min(580px, 96vw)' }}>
         <header className="cj-modal-head">
           <div>
-            <div className="cj-modal-eyebrow">Inteligência da IA · {form.tipo === 'doc' ? 'RAG / PDF' : 'Regra / Texto'}</div>
+            <div className="cj-modal-eyebrow">Inteligência da IA · {form.tipo === 'doc' ? 'Documento / PDF' : 'Regra / Texto'}</div>
             <h2>{isNovo ? 'Adicionar Novo Conhecimento' : 'Editar Conhecimento'}</h2>
           </div>
           <button className="cj-modal-x" onClick={onClose}><Icon name="x" size={16}/></button>
@@ -410,7 +410,7 @@ function ModalConhecimento({ item, isNovo, onClose, onSalvar, onExcluir }) {
                 className={`cj-tipo-opt ${form.tipo === 'doc' ? 'active' : ''}`}
                 onClick={() => set('tipo', 'doc')}
               >
-                <Icon name="doc" size={15}/> <span>Documento / PDF (RAG)</span>
+                <Icon name="doc" size={15}/> <span>Documento / PDF</span>
               </button>
               <button
                 type="button"
@@ -705,7 +705,7 @@ function CfgTipos({ flash }) {
     configIA.conhecimento = [itemTiposRAG, ...conhecimentoFiltrado];
 
     setModal(null);
-    flash('✓ Serviço e instruções salvos! A IA já consulta essa descrição no RAG.');
+    flash('✓ Serviço e instruções salvos! A IA já tem acesso a essa descrição.');
   };
 
   return (
@@ -714,13 +714,13 @@ function CfgTipos({ flash }) {
         <div className="cj-card-head">
           <div>
             <h3>Catálogo de Serviços Previdenciários & Regras para a IA</h3>
-            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Alimentação automática para consulta RAG nos atendimentos no WhatsApp</span>
+            <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Alimentação automática da IA para os atendimentos no WhatsApp</span>
           </div>
           <button className="cj-btn ghost sm" onClick={() => setModal({ novo: true, valores: { nome: '', valor: 'Gratuito (Análise de Direito)', dur: 30, cor: 'indigo', descricao: '' } })}>
             <Icon name="plus" size={12}/> Novo Serviço
           </button>
         </div>
-        <p className="cj-card-p">Cada serviço definido abaixo alimenta a base de conhecimento RAG da Sofia. Ao clicar em editar, você pode detalhar <b>Como Funciona</b> cada etapa para que a IA explique exatamente com as suas palavras aos segurados.</p>
+        <p className="cj-card-p">Cada serviço definido abaixo ajuda a guiar as respostas da Inteligência Artificial. Ao clicar em editar, você pode detalhar <b>Como Funciona</b> cada etapa para que a IA explique exatamente com as suas palavras aos segurados.</p>
         <div className="cj-tipos-list">
           {tipos.map(t => (
             <div key={t.id} className="cj-tipo-row" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'stretch' }}>
@@ -752,7 +752,7 @@ function CfgTipos({ flash }) {
             { k: 'nome', label: 'Nome do Serviço ou Etapa', ph: 'Ex.: Triagem Previdenciária Inicial, Análise de Laudo Médico' },
             { k: 'valor', label: 'Honorários / Custo Cobrado', ph: 'Ex.: Gratuito (Análise de Direito) · 30% sobre Êxito Final' },
             { k: 'dur', label: 'Prazo ou Duração Média (min/dias)', tipo: 'number', ph: '30' },
-            { k: 'descricao', label: '💡 Como Funciona / Orientação para a IA (Consulta RAG)', tipo: 'textarea', rows: 4, ph: 'Explique em detalhes como funciona este serviço e como a IA deve orientar o segurado quando ele demonstrar interesse por este assunto no chat.' },
+            { k: 'descricao', label: '💡 Como Funciona / Orientação para a IA', tipo: 'textarea', rows: 4, ph: 'Explique em detalhes como funciona este serviço e como a IA deve orientar o segurado quando ele demonstrar interesse por este assunto no chat.' },
             { k: 'cor', label: 'Cor de destaque', tipo: 'cor' },
           ]}
           valores={modal.valores}
@@ -929,14 +929,14 @@ function CfgEscritorio({ flash, onUpdateEscritorio, escritorioState }) {
               <Icon name="zap" size={18}/>
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: 15, color: 'var(--ink)' }}>Alimentação Automática da IA & RAG</h3>
-              <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Conexão direta com {configIA.nome || 'Sofia'} (Agente no WhatsApp) e Base pgvector</span>
+              <h3 style={{ margin: 0, fontSize: 15, color: 'var(--ink)' }}>Comportamento Inteligente da IA</h3>
+              <span style={{ fontSize: 11.5, color: 'var(--ink-3)' }}>Atualização em tempo real para os atendimentos no WhatsApp</span>
             </div>
           </div>
           <span className="cj-mini ok"><span className="cj-livedot"/> Sincronização em tempo real</span>
         </div>
         <p className="cj-card-p" style={{ fontSize: 13, color: 'var(--ink-2)', lineHeight: 1.5, marginTop: 4 }}>
-          Todas as alterações feitas no nome, endereço, telefone, e-mail e horário nesta tela são <b>injetadas instantaneamente no Prompt de Identidade</b> e na <b>Base de Conhecimento RAG</b> do seu agente no n8n. Quando qualquer lead no WhatsApp perguntar onde fica o escritório ou se está aberto, a IA responderá com precisão absoluta usando os dados atualizados abaixo!
+          Todas as informações inseridas nesta tela (nome, endereço, telefone, e-mail e horário) servem como diretrizes para o comportamento da IA. Quando o cliente no WhatsApp perguntar informações sobre o escritório, a inteligência artificial responderá exatamente com os dados atualizados abaixo!
         </p>
       </section>
 
@@ -1031,7 +1031,7 @@ function CfgEscritorio({ flash, onUpdateEscritorio, escritorioState }) {
 
         <div className="cj-card-actions">
           <button type="submit" className="cj-btn">
-            <Icon name="check" size={14}/> Salvar Escritório e Sincronizar IA
+            <Icon name="check" size={14}/> Salvar Configurações
           </button>
         </div>
       </section>
