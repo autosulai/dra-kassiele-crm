@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from './Icon';
 import { escritorio, configIA } from '../data/mockData';
 import { supabase } from '../lib/supabase';
