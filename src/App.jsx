@@ -28,6 +28,13 @@ export function App() {
     setTagsLista(prev => prev.some(t => t.id === novaTag.id) ? prev : [...prev, novaTag]);
   };
 
+  const sidebarStats = useMemo(() => {
+    const leads = clientesList.filter(c => c.status === 'lead' || c.origem?.includes('Funil')).length;
+    const clientes = clientesList.filter(c => c.status !== 'lead' && !c.origem?.includes('Funil')).length;
+    const processos = casosList.length;
+    return { leads, clientes, processos };
+  }, [clientesList, casosList]);
+
   const refreshData = async () => {
     const data = await loadAllCRMData();
     if (data) {
@@ -183,7 +190,7 @@ export function App() {
 
   return (
     <div className="cj-app">
-      <Sidebar view={view} setView={setView} onNew={() => { setView('prazos'); setAutoOpenNovaPrazo(true); }} escritorioState={escritorioState}/>
+      <Sidebar view={view} setView={setView} onNew={() => { setView('prazos'); setAutoOpenNovaPrazo(true); }} escritorioState={escritorioState} sidebarStats={sidebarStats}/>
       <main className="cj-main">
         {view === 'dashboard' && (
           <Dashboard

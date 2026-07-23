@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 import { escritorio } from '../data/mockData';
 import { abrirConversas } from '../lib/chatwootService';
 
-export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
+export const Sidebar = ({ view, setView, onNew, escritorioState, sidebarStats }) => {
   const esc = escritorioState || escritorio;
   const items = [
     { id: 'funil', label: 'Funil', icon: 'funnel' },
@@ -59,11 +59,11 @@ export const Sidebar = ({ view, setView, onNew, escritorioState }) => {
       </nav>
 
       <div className="cj-side-card">
-        <div className="cj-side-card-h">Direito Previdenciário</div>
+        <div className="cj-side-card-h">Resumo do CRM</div>
         <div className="cj-side-stats">
-          <div><b>2</b><span>funis ativos</span></div>
-          <div><b>30%</b><span>no êxito</span></div>
-          <div><b>IA</b><span>na triagem</span></div>
+          <div><b>{sidebarStats?.leads || 0}</b><span>Leads no funil</span></div>
+          <div><b>{sidebarStats?.processos || 0}</b><span>Processos ativos</span></div>
+          <div><b>{sidebarStats?.clientes || 0}</b><span>Clientes salvos</span></div>
         </div>
         <div className="cj-side-alert">
           <Icon name="clock" size={12}/> Perícia perdida = benefício negado

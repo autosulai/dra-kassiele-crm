@@ -477,3 +477,43 @@ export async function salvarEtapasKanban(funilId, etapas, deletedIds = []) {
     return { ok: false, erro: err.message };
   }
 }
+
+/** Adiciona um lead manualmente pelo Kanban */
+export async function adicionarLeadKanban(dados) {
+  const novoLead = {
+    nome: dados.nome,
+    telefone: dados.telefone,
+    funil_slug: dados.funil_slug,
+    etapa_slug: dados.etapa_slug || 'triagem',
+    status: 'aberto',
+    origem: 'Inclusão Manual (Kanban)'
+  };
+  
+  if (semSupabase()) {
+    return { ok: true, id: 'mock_' + Date.now(), ...novoLead };
+  }
+
+  try {
+    // get escritorio_id from context if available, otherwise just insert
+    const { data: escData } = await supabase.from('escritorio').select('id').limit(1);
+    const escritorio_id = escData?.[0]?.id || null;
+
+    const { data, error } = await supabase.from('leads').insert([{
+      ...novoLead,
+      escritorio_id
+    }]).select('id').single();
+
+    if (error) throw error;
+    
+    // Inserir no histórico
+    await supabase.from('historico_etapas_lead').insert([{
+      lead_id: data.id,
+      etapa_nova: novoLead.etapa_slug
+    }]);
+
+    return { ok: true, id: data.id, ...novoLead };
+  } catch (err) {
+    console.error('adicionarLeadKanban erro:', err);
+    return { ok: false, erro: err.message };
+  }
+}

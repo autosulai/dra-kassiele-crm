@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 import { MOTIVOS_PERDA } from '../data/funilMock';
 import {
   loadFunis, loadLeadsKanban, loadChecklist, loadHistoricoLead,
-  moverEtapa, marcarDocumento, marcarPerdido, adiarFollowup, trocarFunil, salvarEtapasKanban, adicionarChecklist
+  moverEtapa, marcarDocumento, marcarPerdido, adiarFollowup, trocarFunil, salvarEtapasKanban, adicionarChecklist, adicionarLeadKanban
 } from '../lib/funilService';
 
 const fmtData = (iso) => {
@@ -41,6 +41,8 @@ export const Funil = ({ onGoToChat }) => {
 
   // -- Estados de Edição do Kanban (Colunas) --
   const [modoEdicao, setModoEdicao] = useState(false);
+  const [modalNovoLead, setModalNovoLead] = useState(false);
+  const [novoLeadForm, setNovoLeadForm] = useState({ nome: '', telefone: '' });
   const [etapasEditando, setEtapasEditando] = useState([]);
   const [etapasDeletadas, setEtapasDeletadas] = useState([]);
   const [salvandoColunas, setSalvandoColunas] = useState(false);
@@ -246,9 +248,11 @@ export const Funil = ({ onGoToChat }) => {
       : l));
     flash('🗑️ Tarefa removida do checklist!');
     try {
-      await supabase.from('checklist_documentos').delete().eq('id', item.id);
+      if (supabase) {
+        await supabase.from('checklist_documentos').delete().eq('id', item.id);
+      }
     } catch (err) {
-      // ignora se mock
+      console.error(err);
     }
   };
 
@@ -357,6 +361,14 @@ export const Funil = ({ onGoToChat }) => {
             title="Mostrar apenas quem estourou o prazo da etapa"
           >
             <Icon name="clock" size={14}/> Fora do prazo
+          </button>
+
+          <button
+            className="cj-fn-btn-primario"
+            onClick={() => setModalNovoLead(true)}
+            style={{ padding: '0 12px', height: 32, fontSize: 13, gap: 6 }}
+          >
+            <Icon name="plus" size={14}/> Novo Lead
           </button>
 
           <button
@@ -571,6 +583,46 @@ export const Funil = ({ onGoToChat }) => {
               </section>
             );
           })}
+        </div>
+      )}
+
+      {/* ---------------- Modal de Novo Lead ---------------- */}
+      {modalNovoLead && (
+        <div className="cj-modal-overlay" onClick={() => setModalNovoLead(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.4)', zIndex: 999 }}>
+          <div className="cj-modal-card" onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 12, width: 400, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+            <header style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 16, margin: 0, color: 'var(--ink)' }}>Adicionar Novo Lead</h2>
+              <button onClick={() => setModalNovoLead(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-3)' }}><Icon name="x" size={16}/></button>
+            </header>
+            <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink-2)', marginBottom: 6 }}>Nome do Lead</label>
+                <input type="text" value={novoLeadForm.nome} onChange={e => setNovoLeadForm({ ...novoLeadForm, nome: e.target.value })} style={{ width: '100%', padding: 10, border: '1px solid var(--border)', borderRadius: 6, fontSize: 14 }} placeholder="Ex: João da Silva"/>
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink-2)', marginBottom: 6 }}>Telefone (WhatsApp)</label>
+                <input type="text" value={novoLeadForm.telefone} onChange={e => setNovoLeadForm({ ...novoLeadForm, telefone: e.target.value })} style={{ width: '100%', padding: 10, border: '1px solid var(--border)', borderRadius: 6, fontSize: 14 }} placeholder="Ex: (51) 99999-9999"/>
+              </div>
+              <div style={{ background: 'var(--bg-card)', padding: 12, borderRadius: 6, fontSize: 13, color: 'var(--ink-2)' }}>
+                <Icon name="info" size={14} style={{ marginRight: 6, verticalAlign: 'middle', color: 'var(--primary)' }}/>
+                Será adicionado no funil <b>{funil?.nome}</b>, na etapa de Triagem.
+              </div>
+            </div>
+            <footer style={{ padding: '16px 20px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button className="cj-btn ghost" onClick={() => setModalNovoLead(false)}>Cancelar</button>
+              <button className="cj-btn" disabled={!novoLeadForm.nome || !novoLeadForm.telefone} onClick={async () => {
+                const rs = await adicionarLeadKanban({ ...novoLeadForm, funil_slug: funil.slug });
+                if (rs.ok) {
+                  flash('✓ Lead adicionado com sucesso!');
+                  setModalNovoLead(false);
+                  setNovoLeadForm({ nome: '', telefone: '' });
+                  recarregar();
+                } else {
+                  flash('Erro ao salvar lead.');
+                }
+              }}>Adicionar Lead</button>
+            </footer>
+          </div>
         </div>
       )}
 
