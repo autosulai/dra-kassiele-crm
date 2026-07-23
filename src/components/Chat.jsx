@@ -337,36 +337,13 @@ export const Chat = ({
           </div>
         </header>
 
-        {/* Iframe do Chatwoot substituído pelo Launchpad (Modo App) */}
+        {/* Iframe do Chatwoot ou Placeholder */}
         {isChatwootConfigured ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', textAlign: 'center', background: 'var(--bg)' }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'linear-gradient(135deg, var(--accent), var(--accent-2))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', boxShadow: '0 8px 24px rgba(59,130,246,0.25)' }}>
-              <Icon name="message-circle" size={36}/>
-            </div>
-            <h2 style={{ fontSize: '22px', fontWeight: '700', color: 'var(--ink)', margin: '0 0 12px 0', letterSpacing: '-0.02em' }}>
-              Central de Atendimento
-            </h2>
-            <p style={{ fontSize: '14px', color: 'var(--ink-2)', maxWidth: '480px', lineHeight: '1.6', margin: '0 0 32px 0' }}>
-              O Chatwoot agora roda em <b>Modo App</b> (janela dedicada). Isso garante máxima performance, notificações nativas e evita qualquer bloqueio de segurança do navegador.
-            </p>
-            <button 
-              className="cj-btn primary" 
-              style={{ fontSize: '15px', padding: '12px 28px', borderRadius: '12px' }}
-              onClick={() => {
-                window.open(
-                  chatwootUrl, 
-                  'chatwoot_app', 
-                  'width=1280,height=800,menubar=no,toolbar=no,location=no,status=no,left=100,top=100'
-                );
-                flash('Chatwoot aberto em nova janela!');
-              }}
-            >
-              <Icon name="external" size={18} style={{ marginRight: '8px' }}/> Abrir Chatwoot
-            </button>
-            <p style={{ fontSize: '12px', color: 'var(--ink-3)', marginTop: '24px' }}>
-              Deixe a janela do Chatwoot aberta ao lado do CRM para o fluxo perfeito.
-            </p>
-          </div>
+          <iframe
+            src={chatwootUrl}
+            style={{ flex: 1, width: '100%', border: 'none' }}
+            title="Chatwoot"
+          />
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', textAlign: 'center', background: 'var(--bg)' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: 'rgba(59,130,246,0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
@@ -374,11 +351,14 @@ export const Chat = ({
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '700', color: 'var(--ink)', margin: '0 0 10px 0' }}>Configure o Chatwoot</h3>
             <p style={{ fontSize: '13px', color: 'var(--ink-3)', maxWidth: '460px', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-              Para ativar o atendimento ao vivo, certifique-se de que a variável de ambiente <b>VITE_CHATWOOT_URL</b> está configurada no seu arquivo .env ou na Vercel.
+              Para ativar o atendimento ao vivo integrado, vá em <b>Configurações → Integrações</b> e insira a URL da sua instância self-hosted do Chatwoot, o Token de acesso e o ID da conta.
             </p>
-            <button className="cj-btn" onClick={() => flash('Abra a Vercel e adicione VITE_CHATWOOT_URL nas Environment Variables')}>
-              <Icon name="info" size={14}/> Ver Instruções
+            <button className="cj-btn" onClick={() => flash('Abra a aba Configurações → Integrações para inserir a URL do Chatwoot')}>
+              <Icon name="sparkles" size={14}/> Ir para Configurações
             </button>
+            <p style={{ fontSize: '11px', color: 'var(--ink-4)', marginTop: '20px' }}>
+              💡 Precisa ser uma instância <b>self-hosted</b> para funcionar embutida aqui (o cloud público bloqueia iframe).
+            </p>
           </div>
         )}
       </section>
