@@ -584,7 +584,6 @@ function ClienteDetalhe({
                   color: a.lembrete_enviado ? undefined : 'white',
                   borderColor: a.lembrete_enviado ? undefined : '#25D366'
                 }}
-                disabled={a.lembrete_enviado}
                 title={a.lembrete_enviado ? 'Notificação já enviada' : 'Disparar WhatsApp'}
               >
                 <Icon name={a.lembrete_enviado ? "check" : "whatsapp"} size={13}/> 
