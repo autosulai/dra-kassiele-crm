@@ -216,6 +216,7 @@ function ClienteDetalhe({
   const [tiposEvento, setTiposEvento] = useState([]);
   const [editorPrazo, setEditorPrazo] = useState(null);
   const [confirmResend, setConfirmResend] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   
   useEffect(() => {
     loadTiposEvento().then(setTiposEvento).catch(console.error);
@@ -500,6 +501,19 @@ function ClienteDetalhe({
     dispararWebhookNotificacao(evento);
   };
 
+  const handleApagarCliente = async () => {
+    if (supabase && cliente?.id && !cliente.id.startsWith('c_')) {
+      try {
+        await supabase.from('clientes').delete().eq('id', cliente.id);
+      } catch(err) {
+        console.error('Erro ao apagar:', err);
+      }
+    }
+    setConfirmDelete(false);
+    flash && flash('Cliente excluído com sucesso!');
+    setTimeout(() => window.location.reload(), 800);
+  };
+
   return (
     <div className="cj-cli-detalhe">
       <header className="cj-cli-det-head">
@@ -525,7 +539,12 @@ function ClienteDetalhe({
 
       <div className="cj-cli-det-grid">
         <section className="cj-card">
-          <h3>Contato</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <h3 style={{ margin: 0 }}>Contato</h3>
+            <button className="cj-clean-btn" style={{ color: 'var(--red)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
+              <Icon name="trash" size={16}/>
+            </button>
+          </div>
           <div className="cj-fields">
             <div><label>Telefone</label><span>{cliente.tel || '—'}</span></div>
             <div><label>E-mail</label><span>{cliente.email || '—'}</span></div>
@@ -978,6 +997,23 @@ function ClienteDetalhe({
                   dispararWebhookNotificacao(ev);
               }}>
                   Sim, Reenviar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="cj-fn-modal-bg" onClick={() => setConfirmDelete(false)} style={{ zIndex: 100 }}>
+          <div className="cj-fn-modal" onClick={e => e.stopPropagation()} style={{ width: '380px' }}>
+            <h3 style={{ marginBottom: '10px', fontSize: '16px', color: 'var(--ink-1)' }}>Excluir Cliente?</h3>
+            <p style={{ fontSize: '13px', color: 'var(--ink-3)', lineHeight: '1.5', marginBottom: '20px' }}>
+              Tem certeza que deseja apagar permanentemente <strong>{cliente?.nome}</strong> do sistema? Esta ação também apagará prazos e processos vinculados a este cliente e não pode ser desfeita.
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button className="cj-btn" onClick={() => setConfirmDelete(false)}>Cancelar</button>
+              <button className="cj-btn danger" style={{ backgroundColor: 'var(--red)', color: 'white', borderColor: 'var(--red)' }} onClick={handleApagarCliente}>
+                  Sim, Excluir
               </button>
             </div>
           </div>
