@@ -116,8 +116,7 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
             {[
               { k: 'all', l: `Todos (${baseClientes.length})` },
               { k: 'ativo', l: `Clientes (${baseClientes.filter(c=>c && c.status!=='lead' && !c.origem?.includes('Funil')).length})` },
-              { k: 'lead', l: `Leads Funil (${baseClientes.filter(c=>c && (c.status==='lead' || c.origem?.includes('Funil'))).length})` },
-              { k: 'PF', l: `PF (${baseClientes.filter(c=>c && c.tipo==='PF').length})` }
+              { k: 'lead', l: `Leads Funil (${baseClientes.filter(c=>c && (c.status==='lead' || c.origem?.includes('Funil'))).length})` }
             ].map(f => (
               <button
                 key={f.k}
@@ -1041,7 +1040,7 @@ function ModalNovoCliente({ onClose, onSave }) {
                 onChange={e => setForm({ ...form, tag: e.target.value })}
               >
                 <option value="">-- Nenhuma Etapa --</option>
-                {TAGS_DISPONIVEIS.map(t => (
+                {tagsInitial.map(t => (
                   <option key={t.id} value={t.id}>{t.label.toUpperCase()}</option>
                 ))}
               </select>
