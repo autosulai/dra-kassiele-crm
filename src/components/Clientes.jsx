@@ -1015,7 +1015,6 @@ function ModalNovoCliente({ onClose, onSave }) {
       email: form.email,
       doc_cpf_cnpj: form.cpf,
       area: form.area,
-      tag: form.tag || null,
       tipo: 'PF', // default hidden
       origem: form.origem,
       status: 'ativo'
