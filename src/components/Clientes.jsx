@@ -8,10 +8,11 @@ import { loadEventos } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
 import { abrirConversaChatwoot } from '../lib/chatwootService';
 
-export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag }) => {
+export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, onAddCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag }) => {
   const [q, setQ] = useState('');
   const [filtro, setFiltro] = useState('all');
   const [ativoId, setAtivoId] = useState(clientesList[0]?.id);
+  const [showNewClientModal, setShowNewClientModal] = useState(false);
   const [showTagSelector, setShowTagSelector] = useState(false);
   const [showNewTagModal, setShowNewTagModal] = useState(false);
   const [tagsListaState, setTagsListaState] = useState(tagsInitial);
@@ -103,7 +104,7 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
               <h1>Clientes & Leads</h1>
               <span className="cj-count">{baseClientes.length} cadastrados · {baseClientes.filter(c=>c && (c.status==='lead' || c.origem?.includes('Funil'))).length} no Funil · {baseClientes.filter(c=>c && c.status!=='lead' && !c.origem?.includes('Funil')).length} Clientes Ativos</span>
             </div>
-            <button className="cj-btn sm ghost" onClick={() => onEdit({ cliente: '', advogado: 'a1', tipo: 'PF', doc: '', tel: '', email: '' }, 'novo_cliente')} title="Novo cliente">
+            <button className="cj-btn sm ghost" onClick={() => setShowNewClientModal(true)} title="Novo cliente">
               <Icon name="plus" size={14}/>
             </button>
           </div>
@@ -170,7 +171,19 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
           showNewTagModal={showNewTagModal}
           setShowNewTagModal={setShowNewTagModal}
           salvarNovaTag={salvarNovaTag}
+          onOpenNewClient={() => setShowNewClientModal(true)}
         />
+        {showNewClientModal && (
+          <ModalNovoCliente 
+            onClose={() => setShowNewClientModal(false)}
+            onSave={(novo) => {
+              if (onAddCliente) onAddCliente(novo);
+              setAtivoId(novo.id);
+              flash('✓ Cliente cadastrado com sucesso!');
+              setShowNewClientModal(false);
+            }}
+          />
+        )}
         {toast && <div className="cj-toast"><Icon name="check" size={14}/> {toast}</div>}
       </div>
     </div>
@@ -190,7 +203,8 @@ function ClienteDetalhe({
   alterarTag,
   showNewTagModal,
   setShowNewTagModal,
-  salvarNovaTag
+  salvarNovaTag,
+  onOpenNewClient
 }) {
   const [docsList, setDocsList] = useState(documentosCliente);
   const [showDocModal, setShowDocModal] = useState(false);
@@ -436,7 +450,7 @@ function ClienteDetalhe({
           <button className="cj-btn ghost"><Icon name="phone" size={13}/> Ligar</button>
           <button className="cj-btn ghost"><Icon name="mail" size={13}/> E-mail</button>
           <button className="cj-btn ghost" onClick={() => abrirConversaChatwoot(cliente.tel || cliente.telefone, flash)} title="Abrir a conversa deste cliente no Chatwoot"><Icon name="external" size={13}/> Chatwoot</button>
-          <button className="cj-btn" onClick={() => onEdit()}><Icon name="calendar" size={13}/> Prazos & Perícias</button>
+          <button className="cj-btn primary" onClick={() => onOpenNewClient()}><Icon name="plus" size={13}/> Novo Cliente</button>
         </div>
       </header>
 
@@ -836,3 +850,126 @@ function ClienteDetalhe({
 }
 
 export default Clientes;
+
+function ModalNovoCliente({ onClose, onSave }) {
+  const [form, setForm] = useState({
+    nome: '',
+    telefone: '',
+    email: '',
+    cpf: '',
+    tipo: 'PF',
+    origem: 'Manual'
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.nome.trim() || !form.telefone.trim()) {
+      alert('Nome e Telefone são obrigatórios.');
+      return;
+    }
+    setSaving(true);
+    const novoId = 'c_' + Date.now(); // fallback
+    const payload = {
+      nome: form.nome,
+      telefone: form.telefone,
+      email: form.email,
+      doc_cpf_cnpj: form.cpf,
+      tipo: form.tipo,
+      origem: form.origem,
+      status: 'ativo'
+    };
+
+    let savedClient = { ...payload, id: novoId, desde: new Date().toISOString() };
+
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.from('clientes').insert([payload]).select();
+        if (error) throw error;
+        if (data && data[0]) {
+          savedClient = { ...data[0], doc: data[0].doc_cpf_cnpj, tel: data[0].telefone, desde: data[0].data_cadastro };
+        }
+      } catch (err) {
+        console.error('Erro ao salvar cliente no banco:', err);
+      }
+    }
+
+    setSaving(false);
+    onSave(savedClient);
+  };
+
+  return (
+    <div className="cj-modal-bg" onClick={onClose}>
+      <div className="cj-modal" onClick={e => e.stopPropagation()} style={{ width: 'min(500px, 96vw)' }}>
+        <div className="cj-modal-head">
+          <div>
+            <div className="cj-modal-eyebrow">NOVO CADASTRO</div>
+            <h2>Adicionar Novo Cliente</h2>
+          </div>
+          <button className="cj-modal-x" onClick={onClose}><Icon name="x" size={16}/></button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="cj-modal-body">
+          <div className="cj-field">
+            <label>Nome Completo *</label>
+            <input 
+              required
+              placeholder="Ex: João da Silva"
+              value={form.nome}
+              onChange={e => setForm({ ...form, nome: e.target.value })}
+            />
+          </div>
+
+          <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="cj-field">
+              <label>Telefone (WhatsApp) *</label>
+              <input 
+                required
+                placeholder="Ex: 5551999999999"
+                value={form.telefone}
+                onChange={e => setForm({ ...form, telefone: e.target.value })}
+              />
+            </div>
+            <div className="cj-field">
+              <label>CPF / CNPJ</label>
+              <input 
+                placeholder="Apenas números"
+                value={form.cpf}
+                onChange={e => setForm({ ...form, cpf: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="cj-field">
+              <label>E-mail</label>
+              <input 
+                type="email"
+                placeholder="joao@email.com"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+            <div className="cj-field">
+              <label>Tipo de Cliente</label>
+              <select 
+                value={form.tipo}
+                onChange={e => setForm({ ...form, tipo: e.target.value })}
+              >
+                <option value="PF">Pessoa Física (PF)</option>
+                <option value="PJ">Pessoa Jurídica (PJ)</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="cj-modal-foot">
+            <button type="button" className="cj-btn ghost" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="cj-btn primary" disabled={saving}>
+              {saving ? 'Salvando...' : 'Cadastrar Cliente'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

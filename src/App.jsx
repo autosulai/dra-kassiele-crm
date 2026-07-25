@@ -234,6 +234,7 @@ export function App() {
             onUpdateCasos={handleUpdateCasos}
             onEdit={handleGoToPrazos}
             onUpdateCliente={handleUpdateCliente}
+            onAddCliente={(novo) => setClientesList(prev => [novo, ...prev])}
             targetClient={crmTarget}
             aiName={aiName}
             tagsLista={tagsLista}
