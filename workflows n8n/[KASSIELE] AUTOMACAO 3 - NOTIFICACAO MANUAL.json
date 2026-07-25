@@ -21,7 +21,7 @@
       "parameters": {
         "instanceName": "Kassiele Advocacia",
         "remoteJid": "={{ $json.body.telefone }}@s.whatsapp.net",
-        "messageText": "=\u26a0\ufe0f *Olá, {{ $json.body.nome_cliente }}! Lembrete do Escritório da Dra. Kassiele:*\n\nPassando para lembrar que o seu agendamento de *{{ $json.body.titulo }}* está marcado para: *{{ $json.body.data }}* às *{{ $json.body.hora }}* no local *{{ $json.body.local }}*.\n\nQualquer dúvida, nos chame por aqui!",
+        "messageText": "=\u26a0\ufe0f *Olá, {{ $json.body.nome_cliente }}! Lembrete do Escritório da Dra. Kassiele:*\n\nPassando para lembrar que o seu agendamento de *{{ $json.body.titulo }}* está marcado para: *{{ $json.body.data }}* às *{{ $json.body.hora }}* no local *{{ $json.body.local }}*.\n{{ $json.body.endereco ? '\\n\\ud83d\\udccd *Endereço/Link:* ' + $json.body.endereco + '\\n' : '' }}{{ $json.body.obs ? '\\n\\ud83d\\udccc *Obs:* ' + $json.body.obs + '\\n' : '' }}\nQualquer dúvida, nos chame por aqui!",
         "resource": "messages-api",
         "operation": "send-text"
       },
