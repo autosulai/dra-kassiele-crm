@@ -215,6 +215,7 @@ function ClienteDetalhe({
   const [editingProc, setEditingProc] = useState(null);
   const [tiposEvento, setTiposEvento] = useState([]);
   const [editorPrazo, setEditorPrazo] = useState(null);
+  const [confirmResend, setConfirmResend] = useState(null);
   
   useEffect(() => {
     loadTiposEvento().then(setTiposEvento).catch(console.error);
@@ -444,15 +445,7 @@ function ClienteDetalhe({
     }
   };
 
-  const handleEnviarNotificacao = async (evento, e) => {
-    if (e) e.stopPropagation();
-    
-    if (evento.lembrete_enviado) {
-      if (!window.confirm("Esta notificação já foi enviada. Gostaria de reenviar novamente?")) {
-        return;
-      }
-    }
-
+  const dispararWebhookNotificacao = async (evento) => {
     const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/notificar-pericia';
     
     try {
@@ -494,6 +487,17 @@ function ClienteDetalhe({
       // Reverte se deu erro
       setEventosCli(prev => prev.map(ev => ev.id === evento.id ? { ...ev, lembrete_enviado: false } : ev));
     }
+  };
+
+  const handleEnviarNotificacao = (evento, e) => {
+    if (e) e.stopPropagation();
+    
+    if (evento.lembrete_enviado) {
+      setConfirmResend(evento);
+      return;
+    }
+    
+    dispararWebhookNotificacao(evento);
   };
 
   return (
@@ -953,6 +957,27 @@ function ClienteDetalhe({
                 flash && flash('Prazo salvo com sucesso!');
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {confirmResend && (
+        <div className="cj-fn-modal-bg" onClick={() => setConfirmResend(null)} style={{ zIndex: 100 }}>
+          <div className="cj-fn-modal" onClick={e => e.stopPropagation()} style={{ width: '380px' }}>
+            <h3 style={{ marginBottom: '10px', fontSize: '16px', color: 'var(--ink-1)' }}>Reenviar Notificação?</h3>
+            <p style={{ fontSize: '13px', color: 'var(--ink-3)', lineHeight: '1.5', marginBottom: '20px' }}>
+              Esta notificação já foi enviada anteriormente. Gostaria de disparar a mensagem no WhatsApp novamente?
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <button className="cj-btn" onClick={() => setConfirmResend(null)}>Cancelar</button>
+              <button className="cj-btn success" onClick={() => {
+                  const ev = confirmResend;
+                  setConfirmResend(null);
+                  dispararWebhookNotificacao(ev);
+              }}>
+                  Sim, Reenviar
+              </button>
+            </div>
           </div>
         </div>
       )}
