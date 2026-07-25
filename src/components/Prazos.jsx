@@ -546,6 +546,7 @@ const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogad
     id: evento.id,
     tipo_id: evento.tipo_id || tipoDefault.id || '',
     cliente_id: evento.cliente_id || '',
+    lead_id: evento.lead_id || '',
     processo_id: evento.processo_id || '',
     advogado_id: evento.advogado_id || advogados[0]?.id || '',
     pessoa_nome: evento.pessoa_nome || '',
@@ -564,9 +565,10 @@ const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogad
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const casosDisponiveis = useMemo(() => {
-    if (!form.cliente_id) return casosList;
-    return casosList.filter(p => p.clienteId === form.cliente_id || p.cliente_id === form.cliente_id);
-  }, [form.cliente_id, casosList]);
+    const cid = form.cliente_id || form.lead_id;
+    if (!cid) return casosList;
+    return casosList.filter(p => p.clienteId === cid || p.cliente_id === cid || p.lead_id === cid);
+  }, [form.cliente_id, form.lead_id, casosList]);
 
   const handleSelectCliente = (cliId) => {
     if (!cliId) {
@@ -582,10 +584,13 @@ const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogad
 
     const tipoObj = tipos.find(t => t.id === form.tipo_id) || tipoDefault;
     const novoTitulo = `${tipoObj.nome || 'Prazo'} — ${cli.nome}`;
+    
+    const isLead = cli.status === 'lead';
 
     setForm(f => ({
       ...f,
-      cliente_id: cliId,
+      cliente_id: isLead ? '' : cliId,
+      lead_id: isLead ? cliId : '',
       pessoa_nome: cli.nome,
       pessoa_telefone: cli.tel || cli.telefone || '',
       processo_id: caso ? caso.id : '',
@@ -633,7 +638,7 @@ const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogad
                 titulo: c.nome,
                 subtitulo: c.doc || c.tel || c.telefone || 'Segurado'
               }))}
-              valorSelecionado={form.cliente_id}
+              valorSelecionado={form.cliente_id || form.lead_id}
               onSelecionar={handleSelectCliente}
               placeholder="-- Selecione ou busque um cliente --"
               labelRecentes="🕒 ÚLTIMOS 5 CLIENTES ADICIONADOS NO CRM:"
