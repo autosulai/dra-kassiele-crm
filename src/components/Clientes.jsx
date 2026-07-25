@@ -990,7 +990,7 @@ export default Clientes;
 function ModalNovoCliente({ onClose, onSave }) {
   const [form, setForm] = useState({
     nome: '',
-    telefone: '',
+    telefone: '55',
     email: '',
     cpf: '',
     area: 'Previdenciário',

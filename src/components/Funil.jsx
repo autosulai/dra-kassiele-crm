@@ -42,7 +42,7 @@ export const Funil = ({ onGoToChat }) => {
   // -- Estados de Edição do Kanban (Colunas) --
   const [modoEdicao, setModoEdicao] = useState(false);
   const [modalNovoLead, setModalNovoLead] = useState(false);
-  const [novoLeadForm, setNovoLeadForm] = useState({ nome: '', telefone: '' });
+  const [novoLeadForm, setNovoLeadForm] = useState({ nome: '', telefone: '55' });
   const [etapasEditando, setEtapasEditando] = useState([]);
   const [etapasDeletadas, setEtapasDeletadas] = useState([]);
   const [salvandoColunas, setSalvandoColunas] = useState(false);
@@ -622,7 +622,7 @@ export const Funil = ({ onGoToChat }) => {
                 if (rs.ok) {
                   flash('✓ Lead adicionado com sucesso!');
                   setModalNovoLead(false);
-                  setNovoLeadForm({ nome: '', telefone: '' });
+                  setNovoLeadForm({ nome: '', telefone: '55' });
                   recarregar();
                 } else {
                   flash('Erro ao salvar lead.');
