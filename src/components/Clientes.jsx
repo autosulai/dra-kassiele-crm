@@ -587,29 +587,31 @@ function ClienteDetalhe({
             {/* Seletor Rápido de Etapa / Tag Integrado igual ao Chat */}
             <div style={{ gridColumn: '1 / -1', paddingTop: '10px', marginTop: '6px', borderTop: '1px dashed var(--border-2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
               <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--ink-3)' }}>Etapa / Tag</label>
-              <div className="cj-tag-selector-wrapper">
-                <button className="cj-clean-tag-pill" onClick={() => setShowTagSelector(!showTagSelector)}>
-                  <ChatTag tag={cliente.tag || (cliente.status === 'lead' || cliente.origem?.includes('Funil') ? 'lead' : 'cliente')} tagsLista={tagsLista}/>
-                  <Icon name="chevron" size={11}/>
-                </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="cj-tag-selector-wrapper">
+                  <button className="cj-clean-tag-pill" onClick={() => setShowTagSelector(!showTagSelector)}>
+                    <ChatTag tag={cliente.tag || (cliente.status === 'lead' || cliente.origem?.includes('Funil') ? 'lead' : 'cliente')} tagsLista={tagsLista}/>
+                    <Icon name="chevron" size={11}/>
+                  </button>
 
-                {showTagSelector && (
-                  <div className="cj-tag-dropdown" style={{ right: 0, left: 'auto', zIndex: 50 }}>
-                    <div className="cj-tag-dropdown-title">Alterar etapa / tag do cliente:</div>
-                    <div className="cj-tag-options">
-                      {tagsLista.map(t => (
-                        <button key={t.id} className={`cj-tag-option ${(cliente.tag || (cliente.status === 'lead' || cliente.origem?.includes('Funil') ? 'lead' : 'cliente')) === t.id ? 'active' : ''}`} onClick={() => alterarTag(t.id)}>
-                          <span className={`cj-chattag ${t.cor}`}>{t.label}</span>
-                          <span className="cj-tag-desc">{t.desc}</span>
-                        </button>
-                      ))}
+                  {showTagSelector && (
+                    <div className="cj-tag-dropdown" style={{ right: 0, left: 'auto', zIndex: 50 }}>
+                      <div className="cj-tag-dropdown-title">Alterar etapa / tag do cliente:</div>
+                      <div className="cj-tag-options">
+                        {tagsLista.map(t => (
+                          <button key={t.id} className={`cj-tag-option ${(cliente.tag || (cliente.status === 'lead' || cliente.origem?.includes('Funil') ? 'lead' : 'cliente')) === t.id ? 'active' : ''}`} onClick={() => alterarTag(t.id)}>
+                            <span className={`cj-chattag ${t.cor}`}>{t.label}</span>
+                            <span className="cj-tag-desc">{t.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <button className="cj-tag-add-btn" onClick={() => { setShowTagSelector(false); setShowNewTagModal(true); }}>
+                        <Icon name="plus" size={12}/> Criar nova tag
+                      </button>
                     </div>
-                    <button className="cj-tag-add-btn" onClick={() => { setShowTagSelector(false); setShowNewTagModal(true); }}>
-                      <Icon name="plus" size={12}/> Criar nova tag
-                    </button>
-                  </div>
-                )}
-                <button className="cj-btn ghost" style={{ marginLeft: '10px' }} onClick={() => setModalFunil(true)}>
+                  )}
+                </div>
+                <button className="cj-btn ghost" onClick={() => setModalFunil(true)}>
                   <Icon name="plus" size={12}/> Enviar p/ Funil
                 </button>
               </div>
