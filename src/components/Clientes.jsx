@@ -4,7 +4,7 @@ import { clientes, casos, corAdv, nomeAdv, iniciais, fmtData, documentosCliente,
 import { ChatTag } from './ChatTag';
 import { ModalNovaTag } from './ModalNovaTag';
 import { supabase } from '../lib/supabase';
-import { loadEventos, loadTiposEvento } from '../lib/funilService';
+import { loadEventos, loadTiposEvento, salvarEvento } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
 import { abrirConversaChatwoot } from '../lib/chatwootService';
 import { EditorPrazo } from './Prazos';
@@ -951,7 +951,9 @@ function ClienteDetalhe({
               casosList={casosList}
               advogados={escritorioState?.advogados?.length > 0 ? escritorioState.advogados : escritorio.advogados}
               onFechar={() => setEditorPrazo(null)}
-              onSalvar={() => {
+              onSalvar={async (payload) => {
+                flash && flash('Salvando...');
+                await salvarEvento(payload);
                 setEditorPrazo(null);
                 recarregarEventos();
                 flash && flash('Prazo salvo com sucesso!');
