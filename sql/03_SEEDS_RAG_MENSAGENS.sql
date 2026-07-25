@@ -255,7 +255,7 @@ INSERT INTO modelos_mensagem (escritorio_id, slug, titulo, categoria, funil_slug
 
 -- ---- ABERTURA E TRIAGEM -------------------------------------------------
 (v_esc, 'boas_vindas', 'Boas-vindas e primeira pergunta', 'Triagem', NULL, 'triagem', 'texto',
-'Oi, {{nome}}! Aqui é a Sofia, do escritório da Dra. Kassiele. Tudo bem?
+'Oi, {{nome}}! Aqui é a {{nome_agente}}, do escritório da Dra. Kassiele. Tudo bem?
 
 Me conta rapidinho o que está acontecendo pra eu poder te ajudar.'),
 

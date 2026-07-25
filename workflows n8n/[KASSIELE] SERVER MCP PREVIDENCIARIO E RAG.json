@@ -4,17 +4,17 @@
     {
       "parameters": {
         "content": "# MCP SERVER — TOOLS PREVIDENCIÁRIAS (INSS)",
-        "height": 400,
-        "width": 2200,
+        "height": 432,
+        "width": 1560,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        256,
-        -64
+        -560,
+        -288
       ],
       "typeVersion": 1,
-      "id": "sticky-mcp-previ",
+      "id": "d4b31a18-3763-42d7-b62d-c0a0bcbbb1b9",
       "name": "Sticky Note"
     },
     {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.dateTimeTool",
       "typeVersion": 2,
       "position": [
-        1216,
-        192
+        832,
+        -32
       ],
-      "id": "tool-datetime",
+      "id": "855de062-46f1-4a69-9390-24efbf29564d",
       "name": "Date & Time"
     },
     {
@@ -37,11 +37,12 @@
       "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
       "typeVersion": 2,
       "position": [
-        992,
-        -48
+        176,
+        -272
       ],
-      "id": "mcp-trigger-previ",
-      "name": "MCP Server Trigger"
+      "id": "f53d5951-9fa4-4a56-8c80-626fedb085c2",
+      "name": "MCP Server Trigger",
+      "webhookId": "ee9e45c8-a84c-4383-a95d-554f03b6e250"
     },
     {
       "parameters": {
@@ -63,15 +64,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        304,
-        192
+        -208,
+        -32
       ],
-      "id": "tool-contexto-lead",
+      "id": "cd3f6eab-a037-44dc-b7bc-d4c6c5eca1e4",
       "name": "contexto_lead",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -110,15 +111,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        512,
-        192
+        0,
+        -32
       ],
-      "id": "tool-classificar",
+      "id": "d1beaa23-1610-40ad-a0d8-7a1b71b7d125",
       "name": "classificar_lead",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -153,15 +154,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        720,
-        192
+        208,
+        -32
       ],
-      "id": "tool-atualizar",
+      "id": "94f4f944-ca82-4ea3-a049-5c08db064f71",
       "name": "atualizar_lead",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -192,15 +193,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        928,
-        192
+        416,
+        -32
       ],
-      "id": "tool-avancar",
+      "id": "880edf74-8878-415c-9928-6a6fc52074aa",
       "name": "avancar_etapa",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -224,15 +225,15 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1136,
-        192
+        624,
+        -32
       ],
-      "id": "tool-consultar-rag",
+      "id": "db09c1cd-b282-4fa7-923e-75fde2c36794",
       "name": "consultar_andamento",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     }
@@ -306,13 +307,18 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "timezone": "America/Sao_Paulo"
+    "availableInMCP": false
   },
+  "versionId": "f0b2c15c-e26e-48bb-936d-a0d87e976a75",
   "meta": {
-    "templateCredsSetupCompleted": true
-  }
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20121183c73c930b96c2957f692b4fe98e5034b7c0f6533053109b77a4980a9b"
+  },
+  "nodeGroups": [],
+  "id": "NFC9KKmVjQ2IbGP4",
+  "tags": []
 }

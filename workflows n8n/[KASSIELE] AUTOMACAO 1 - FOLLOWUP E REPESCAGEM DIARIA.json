@@ -19,7 +19,7 @@
         300
       ],
       "id": "cron-09h",
-      "name": "Cron 09h Diário"
+      "name": "Cron 09h Di\u00e1rio"
     },
     {
       "parameters": {
@@ -47,14 +47,14 @@
         "remoteJid": "={{ $json.telefone }}@s.whatsapp.net",
         "messageText": "={{ $json.mensagem }}"
       },
-      "type": "n8n-nodes-base.evolutionApi",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
         700,
         300
       ],
       "id": "send-followup",
-      "name": "Enviar Cobrança de Laudos",
+      "name": "Enviar Cobran\u00e7a de Laudos",
       "credentials": {
         "evolutionApi": {
           "id": "CRED_EVOLUTION_ID",
@@ -64,7 +64,7 @@
     }
   ],
   "connections": {
-    "Cron 09h Diário": {
+    "Cron 09h Di\u00e1rio": {
       "main": [
         [
           {
@@ -79,7 +79,7 @@
       "main": [
         [
           {
-            "node": "Enviar Cobrança de Laudos",
+            "node": "Enviar Cobran\u00e7a de Laudos",
             "type": "main",
             "index": 0
           }
