@@ -461,6 +461,8 @@ function ClienteDetalhe({
         data: evento.data_hora ? new Date(evento.data_hora).toLocaleDateString('pt-BR') : 'Data a definir',
         hora: evento.hora || (evento.data_hora ? new Date(evento.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : 'Horário a definir'),
         local: evento.local || evento.local_tipo || 'INSS/Juízo',
+        endereco: evento.local_detalhe || '',
+        obs: evento.obs || '',
         nome_cliente: cliente.nome,
         telefone: cliente.telefone || cliente.tel,
       };
