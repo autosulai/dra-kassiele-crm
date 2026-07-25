@@ -538,6 +538,8 @@ export async function adicionarLeadKanban(dados) {
     telefone: dados.telefone,
     funil_slug: dados.funil_slug,
     etapa_slug: dados.etapa_slug || 'triagem',
+    cliente_id: dados.cliente_id || null,
+    cpf: dados.cpf || null,
     status: 'aberto',
     origem: 'Inclusão Manual (Kanban)'
   };
