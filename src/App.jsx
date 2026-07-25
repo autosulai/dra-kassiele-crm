@@ -239,6 +239,7 @@ export function App() {
             aiName={aiName}
             tagsLista={tagsLista}
             onAddTag={handleAddTag}
+            escritorioState={escritorioState}
           />
         )}
         {view === 'casos' && (

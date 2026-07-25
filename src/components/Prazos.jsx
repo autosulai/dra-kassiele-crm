@@ -538,7 +538,7 @@ const AjudaDica = ({ que, porque }) => (
   </span>
 );
 
-const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogados = [], onFechar, onSalvar }) => {
+export const EditorPrazo = ({ evento, tipos, clientesList = [], casosList = [], advogados = [], onFechar, onSalvar }) => {
   const inicial = evento.data_hora ? new Date(evento.data_hora) : new Date();
   const tipoDefault = tipos.find(t => t.id === evento.tipo_id) || tipos[0] || {};
 

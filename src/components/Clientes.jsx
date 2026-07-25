@@ -4,11 +4,12 @@ import { clientes, casos, corAdv, nomeAdv, iniciais, fmtData, documentosCliente,
 import { ChatTag } from './ChatTag';
 import { ModalNovaTag } from './ModalNovaTag';
 import { supabase } from '../lib/supabase';
-import { loadEventos } from '../lib/funilService';
+import { loadEventos, loadTiposEvento } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
 import { abrirConversaChatwoot } from '../lib/chatwootService';
+import { EditorPrazo } from './Prazos';
 
-export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, onAddCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag }) => {
+export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, onAddCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag, escritorioState }) => {
   const [q, setQ] = useState('');
   const [filtro, setFiltro] = useState('all');
   const [ativoId, setAtivoId] = useState(clientesList[0]?.id);
@@ -183,7 +184,7 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
             }}
           />
         )}
-        {toast && <div className="cj-toast"><Icon name="check" size={14}/> {toast}</div>}
+        {toast && <div className="cj-toast"><Icon name="check" size={16}/> {toast}</div>}
       </div>
     </div>
   );
@@ -192,6 +193,8 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
 function ClienteDetalhe({
   cliente,
   casosList,
+  clientesList,
+  escritorioState,
   onUpdateCasos,
   onEdit,
   flash,
@@ -206,10 +209,15 @@ function ClienteDetalhe({
   onOpenNewClient
 }) {
   const [docsList, setDocsList] = useState(documentosCliente);
-  const [showDocModal, setShowDocModal] = useState(false);
   const [docForm, setDocForm] = useState({ titulo: '', tipo: 'andamento', conteudo_texto: '', arquivo_url: '', liberado_cliente: true, arquivo: null, arquivoNome: '', arquivoUrl: '' });
   const [showProcModal, setShowProcModal] = useState(false);
   const [editingProc, setEditingProc] = useState(null);
+  const [tiposEvento, setTiposEvento] = useState([]);
+  const [editorPrazo, setEditorPrazo] = useState(null);
+  
+  useEffect(() => {
+    loadTiposEvento().then(setTiposEvento).catch(console.error);
+  }, []);
 
   const handleFileSelectClient = (e) => {
     const file = e.target.files?.[0];
@@ -352,12 +360,17 @@ function ClienteDetalhe({
   }, [cliente?.id]);
 
   const [eventosCli, setEventosCli] = useState([]);
-  useEffect(() => {
+  
+  const recarregarEventos = () => {
     if (cliente?.id) {
       loadEventos().then(evs => {
         setEventosCli(evs.filter(e => e && (e.cliente_id === cliente.id || e.lead_id === cliente.id || e.clienteId === cliente.id || e.leadId === cliente.id)));
       }).catch(() => {});
     }
+  };
+
+  useEffect(() => {
+    recarregarEventos();
   }, [cliente?.id]);
 
   if (!cliente) return <div className="cj-cli-detalhe empty">Selecione um cliente.</div>;
@@ -541,18 +554,33 @@ function ClienteDetalhe({
         <section className="cj-card">
           <h3>Próximos prazos e perícias</h3>
           {proximos.length > 0 ? proximos.map(a => (
-            <div key={a.id} className="cj-cli-appt" onClick={() => onEdit(a)}>
-              <div className="cj-cli-appt-time"><b>{a.hora || (a.data_hora ? new Date(a.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '09:00')}</b><span>{fmtData(a.data_hora)}</span></div>
+            <div key={a.id} className="cj-cli-appt" onClick={() => setEditorPrazo(a)}>
+              <div className="cj-cli-appt-time">
+                <b>
+                  {a.hora || (a.data_hora ? new Date(a.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '09:00')}
+                </b>
+                <span style={{ fontSize: '10px' }}>
+                  {a.data_hora ? (() => {
+                    const d = new Date(a.data_hora);
+                    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                  })() : fmtData(a.data_hora)}
+                </span>
+              </div>
               <div className="cj-cli-appt-main" style={{ flex: 1 }}><div>{a.titulo}</div><span>{nomeAdv(a.advogado || a.advogado_id)} · {a.local || 'INSS/Juízo'}</span></div>
               
               <button 
-                className={`cj-btn sm ${a.lembrete_enviado ? 'ghost' : 'success'}`} 
+                className={`cj-btn sm ${a.lembrete_enviado ? 'ghost' : ''}`} 
                 onClick={(e) => handleEnviarNotificacao(a, e)}
-                style={{ marginLeft: 'auto', marginRight: '10px', fontSize: '11px', padding: '4px 10px', minWidth: '125px', justifyContent: 'center' }}
+                style={{ 
+                  marginLeft: 'auto', marginRight: '10px', fontSize: '11px', padding: '4px 10px', minWidth: '125px', justifyContent: 'center',
+                  backgroundColor: a.lembrete_enviado ? undefined : '#25D366',
+                  color: a.lembrete_enviado ? undefined : 'white',
+                  borderColor: a.lembrete_enviado ? undefined : '#25D366'
+                }}
                 disabled={a.lembrete_enviado}
                 title={a.lembrete_enviado ? 'Notificação já enviada' : 'Disparar WhatsApp'}
               >
-                <Icon name={a.lembrete_enviado ? "check" : "send"} size={12}/> 
+                <Icon name={a.lembrete_enviado ? "check" : "whatsapp"} size={13}/> 
                 {a.lembrete_enviado ? 'Enviado' : 'Notificar'}
               </button>
 
@@ -902,6 +930,26 @@ function ClienteDetalhe({
         </div>
       )}
       {showNewTagModal && <ModalNovaTag onClose={() => setShowNewTagModal(false)} onSave={salvarNovaTag} />}
+      
+      {editorPrazo && (
+        <div className="cj-modal-overlay">
+          <div className="cj-modal cj-modal-lg">
+            <EditorPrazo
+              evento={editorPrazo}
+              tipos={tiposEvento}
+              clientesList={clientesList}
+              casosList={casosList}
+              advogados={escritorioState?.advogados || []}
+              onFechar={() => setEditorPrazo(null)}
+              onSalvar={() => {
+                setEditorPrazo(null);
+                recarregarEventos();
+                flash && flash('Prazo salvo com sucesso!');
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
