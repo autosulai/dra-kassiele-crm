@@ -541,7 +541,7 @@ function ClienteDetalhe({
         <section className="cj-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <h3 style={{ margin: 0 }}>Contato</h3>
-            <button className="cj-clean-btn" style={{ color: 'var(--red)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
+            <button className="cj-clean-btn" style={{ color: 'var(--live)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
               <Icon name="trash" size={16}/>
             </button>
           </div>
@@ -1012,7 +1012,7 @@ function ClienteDetalhe({
             </p>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
               <button className="cj-btn" onClick={() => setConfirmDelete(false)}>Cancelar</button>
-              <button className="cj-btn danger" style={{ backgroundColor: 'var(--red)', color: 'white', borderColor: 'var(--red)' }} onClick={handleApagarCliente}>
+              <button className="cj-btn danger" style={{ backgroundColor: 'var(--live)', color: 'white', borderColor: 'var(--live)' }} onClick={handleApagarCliente}>
                   Sim, Excluir
               </button>
             </div>
