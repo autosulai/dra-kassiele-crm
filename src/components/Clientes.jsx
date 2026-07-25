@@ -990,8 +990,8 @@ function ClienteDetalhe({
               Esta notificação já foi enviada anteriormente. Gostaria de disparar a mensagem no WhatsApp novamente?
             </p>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-              <button className="cj-btn" onClick={() => setConfirmResend(null)}>Cancelar</button>
-              <button className="cj-btn success" onClick={() => {
+              <button className="cj-btn danger" style={{ backgroundColor: 'var(--live)', color: 'white', borderColor: 'var(--live)' }} onClick={() => setConfirmResend(null)}>Cancelar</button>
+              <button className="cj-btn success" style={{ backgroundColor: 'var(--ok)', color: 'white', borderColor: 'var(--ok)' }} onClick={() => {
                   const ev = confirmResend;
                   setConfirmResend(null);
                   dispararWebhookNotificacao(ev);
