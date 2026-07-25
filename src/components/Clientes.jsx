@@ -4,7 +4,7 @@ import { clientes, casos, corAdv, nomeAdv, iniciais, fmtData, documentosCliente,
 import { ChatTag } from './ChatTag';
 import { ModalNovaTag } from './ModalNovaTag';
 import { supabase } from '../lib/supabase';
-import { loadEventos, loadTiposEvento, salvarEvento } from '../lib/funilService';
+import { loadEventos, loadTiposEvento, salvarEvento, loadFunis, adicionarLeadKanban } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
 import { abrirConversaChatwoot } from '../lib/chatwootService';
 import { EditorPrazo } from './Prazos';
@@ -218,8 +218,19 @@ function ClienteDetalhe({
   const [confirmResend, setConfirmResend] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   
+  // -- Funil --
+  const [funis, setFunis] = useState([]);
+  const [modalFunil, setModalFunil] = useState(false);
+  const [formFunil, setFormFunil] = useState({ funil_slug: '', etapa_slug: '' });
+  
   useEffect(() => {
     loadTiposEvento().then(setTiposEvento).catch(console.error);
+    loadFunis().then(res => {
+      setFunis(res || []);
+      if (res && res.length > 0) {
+        setFormFunil({ funil_slug: res[0].slug, etapa_slug: res[0].etapas?.[0]?.slug || '' });
+      }
+    }).catch(console.error);
   }, []);
 
   const handleFileSelectClient = (e) => {
@@ -514,6 +525,28 @@ function ClienteDetalhe({
     setTimeout(() => window.location.reload(), 800);
   };
 
+  const handleEnviarFunil = async () => {
+    if (!formFunil.funil_slug || !formFunil.etapa_slug) {
+      flash && flash('Selecione um funil e uma etapa.');
+      return;
+    }
+    flash && flash('Adicionando ao funil...');
+    const rs = await adicionarLeadKanban({
+      nome: cliente.nome,
+      telefone: cliente.tel || cliente.telefone,
+      cliente_id: cliente.id,
+      funil_slug: formFunil.funil_slug,
+      etapa_slug: formFunil.etapa_slug
+    });
+    if (rs.ok) {
+      flash && flash('Cliente enviado para o funil com sucesso!');
+      setModalFunil(false);
+      setTimeout(() => window.location.reload(), 800);
+    } else {
+      flash && flash('Erro ao enviar para o funil.');
+    }
+  };
+
   return (
     <div className="cj-cli-detalhe">
       <header className="cj-cli-det-head">
@@ -576,6 +609,9 @@ function ClienteDetalhe({
                     </button>
                   </div>
                 )}
+                <button className="cj-btn ghost" style={{ marginLeft: '10px' }} onClick={() => setModalFunil(true)}>
+                  <Icon name="plus" size={12}/> Enviar p/ Funil
+                </button>
               </div>
             </div>
           </div>
@@ -1014,6 +1050,48 @@ function ClienteDetalhe({
               <button className="cj-btn" onClick={() => setConfirmDelete(false)}>Cancelar</button>
               <button className="cj-btn danger" style={{ backgroundColor: 'var(--live)', color: 'white', borderColor: 'var(--live)' }} onClick={handleApagarCliente}>
                   Sim, Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalFunil && (
+        <div className="cj-fn-modal-bg" onClick={() => setModalFunil(false)} style={{ zIndex: 100 }}>
+          <div className="cj-fn-modal" onClick={e => e.stopPropagation()} style={{ width: '400px' }}>
+            <h3 style={{ marginBottom: '20px', fontSize: '16px', color: 'var(--ink-1)' }}>Enviar para o Funil</h3>
+            <div className="cj-fields" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>Funil de Vendas</label>
+                <select 
+                  className="cj-input" 
+                  value={formFunil.funil_slug}
+                  onChange={(e) => {
+                    const fSlug = e.target.value;
+                    const f = funis.find(x => x.slug === fSlug);
+                    setFormFunil({ funil_slug: fSlug, etapa_slug: f?.etapas?.[0]?.slug || '' });
+                  }}
+                >
+                  {funis.map(f => <option key={f.id} value={f.slug}>{f.nome}</option>)}
+                </select>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>Etapa</label>
+                <select 
+                  className="cj-input" 
+                  value={formFunil.etapa_slug}
+                  onChange={(e) => setFormFunil({ ...formFunil, etapa_slug: e.target.value })}
+                >
+                  {(funis.find(f => f.slug === formFunil.funil_slug)?.etapas || []).map(e => (
+                    <option key={e.id} value={e.slug}>{e.nome}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '24px' }}>
+              <button className="cj-btn" onClick={() => setModalFunil(false)}>Cancelar</button>
+              <button className="cj-btn primary" onClick={handleEnviarFunil}>
+                  Adicionar
               </button>
             </div>
           </div>
