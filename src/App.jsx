@@ -209,7 +209,7 @@ export function App() {
           <Prazos 
             clientesList={clientesList} 
             casosList={casosList} 
-            advogados={escritorioState?.advogados || []}
+            advogados={escritorioState?.advogados?.length > 0 ? escritorioState.advogados : escritorio.advogados}
             targetClient={prazosTarget}
             autoOpenNew={autoOpenNovaPrazo}
             onAutoOpenEnd={() => setAutoOpenNovaPrazo(false)}

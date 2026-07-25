@@ -447,7 +447,11 @@ function ClienteDetalhe({
   const handleEnviarNotificacao = async (evento, e) => {
     if (e) e.stopPropagation();
     
-    if (evento.lembrete_enviado) return; // já enviado
+    if (evento.lembrete_enviado) {
+      if (!window.confirm("Esta notificação já foi enviada. Gostaria de reenviar novamente?")) {
+        return;
+      }
+    }
 
     const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/notificar-pericia';
     
@@ -942,7 +946,7 @@ function ClienteDetalhe({
               tipos={tiposEvento}
               clientesList={clientesList}
               casosList={casosList}
-              advogados={escritorioState?.advogados || []}
+              advogados={escritorioState?.advogados?.length > 0 ? escritorioState.advogados : escritorio.advogados}
               onFechar={() => setEditorPrazo(null)}
               onSalvar={() => {
                 setEditorPrazo(null);
