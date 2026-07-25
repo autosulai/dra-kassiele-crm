@@ -18,11 +18,28 @@ async function mesclarLeadsAosClientes(listaClientes, listaCasos) {
 
     leads.forEach(l => {
       if (!l || !l.id) return;
-      if (!cIds.has(l.id) && (!l.cpf || !cCpfs.has(l.cpf))) {
-        cIds.add(l.id);
+      
+      // Se o lead tem um cliente_id que já existe na lista, atualizamos o cliente e não duplicamos
+      if (l.cliente_id && cIds.has(l.cliente_id)) {
+        const cExistente = clientesFinal.find(c => c.id === l.cliente_id);
+        if (cExistente) {
+          cExistente.origem = `Funil (${l.etapa_nome || 'Triagem'})`;
+          cExistente.etapa_nome = l.etapa_nome;
+          cExistente.funil_slug = l.funil_slug;
+          if (cExistente.status !== 'ativo' && l.status === 'aberto') {
+            cExistente.status = 'lead';
+          }
+        }
+        return;
+      }
+      
+      // Se não, criamos um novo cliente fake na UI para o lead aparecer
+      if (!cIds.has(l.cliente_id) && (!l.cpf || !cCpfs.has(l.cpf))) {
+        const novoId = l.cliente_id || l.id;
+        cIds.add(novoId);
         if (l.cpf) cCpfs.add(l.cpf);
         clientesFinal.push({
-          id: l.id,
+          id: novoId,
           nome: l.nome || 'Lead do Funil',
           tipo: 'PF',
           doc: l.cpf || '—',

@@ -146,7 +146,6 @@ export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateC
                     <ChatTag tag={c.tag || (c.status === 'lead' || c.origem?.includes('Funil') ? 'lead' : 'cliente')} tagsLista={tagsLista}/>
                   </div>
                   <div className="cj-cli-meta">
-                    <span className="cj-badge-tipo" style={{ fontSize: '9px', padding: '1px 5px' }}>{c.tipo || 'PF'}</span>
                     <span>{numCasos} {numCasos === 1 ? 'processo' : 'processos'}</span>
                   </div>
                 </div>
@@ -555,7 +554,6 @@ function ClienteDetalhe({
           <div>
             <h2>{cliente.nome || 'Cliente sem nome'}</h2>
             <div className="cj-cli-det-sub">
-              <span className="cj-badge-tipo">{cliente.tipo || 'PF'}</span>
               <span>{cliente.doc || '—'}</span>
               <span className="sep">·</span>
               <span>cliente desde {fmtData(cliente.desde)}</span>
