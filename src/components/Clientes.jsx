@@ -857,8 +857,11 @@ function ModalNovoCliente({ onClose, onSave }) {
     telefone: '',
     email: '',
     cpf: '',
-    tipo: 'PF',
-    origem: 'Manual'
+    area: 'Previdenciário',
+    tag: '',
+    origem: 'Manual',
+    arquivo: null,
+    arquivoNome: ''
   });
   const [saving, setSaving] = useState(false);
 
@@ -875,7 +878,9 @@ function ModalNovoCliente({ onClose, onSave }) {
       telefone: form.telefone,
       email: form.email,
       doc_cpf_cnpj: form.cpf,
-      tipo: form.tipo,
+      area: form.area,
+      tag: form.tag || null,
+      tipo: 'PF', // default hidden
       origem: form.origem,
       status: 'ativo'
     };
@@ -888,6 +893,22 @@ function ModalNovoCliente({ onClose, onSave }) {
         if (error) throw error;
         if (data && data[0]) {
           savedClient = { ...data[0], doc: data[0].doc_cpf_cnpj, tel: data[0].telefone, desde: data[0].data_cadastro };
+          
+          if (form.arquivo) {
+            try {
+              const respUrl = await uploadArquivoSupabase(form.arquivo, 'clientes_docs');
+              await supabase.from('documentos_cliente').insert({
+                cliente_id: savedClient.id,
+                titulo: form.arquivoNome.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+                tipo: 'andamento',
+                conteudo_texto: `Documento de entrada (${form.arquivoNome}) anexado no cadastro.`,
+                arquivo_url: respUrl,
+                liberado_cliente: true
+              });
+            } catch (errUp) {
+              console.error('Erro no upload de doc inicial:', errUp);
+            }
+          }
         }
       } catch (err) {
         console.error('Erro ao salvar cliente no banco:', err);
@@ -942,24 +963,52 @@ function ModalNovoCliente({ onClose, onSave }) {
 
           <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="cj-field">
-              <label>E-mail</label>
-              <input 
-                type="email"
-                placeholder="joao@email.com"
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-            <div className="cj-field">
-              <label>Tipo de Cliente</label>
+              <label>Benefício / Área Jurídica</label>
               <select 
-                value={form.tipo}
-                onChange={e => setForm({ ...form, tipo: e.target.value })}
+                value={form.area}
+                onChange={e => setForm({ ...form, area: e.target.value })}
               >
-                <option value="PF">Pessoa Física (PF)</option>
-                <option value="PJ">Pessoa Jurídica (PJ)</option>
+                <option value="Previdenciário">Previdenciário (Geral)</option>
+                <option value="BPC-LOAS">BPC-LOAS (Assistencial)</option>
+                <option value="Auxílio Doença">Auxílio Doença / Incapacidade</option>
+                <option value="Aposentadoria">Aposentadorias & Revisões</option>
+                <option value="Pensão por Morte">Pensão por Morte / Maternidade</option>
+                <option value="Recurso / Revisão">Recurso / Revisão INSS</option>
               </select>
             </div>
+            <div className="cj-field">
+              <label>Etapa Kanban (Opcional)</label>
+              <select 
+                value={form.tag}
+                onChange={e => setForm({ ...form, tag: e.target.value })}
+              >
+                <option value="">-- Nenhuma Etapa --</option>
+                {TAGS_DISPONIVEIS.map(t => (
+                  <option key={t.id} value={t.id}>{t.label.toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="cj-field">
+            <label>E-mail</label>
+            <input 
+              type="email"
+              placeholder="joao@email.com"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+
+          <div className="cj-field">
+            <label>Anexar Documento Inicial (Opcional)</label>
+            <input 
+              type="file"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) setForm({ ...form, arquivo: file, arquivoNome: file.name });
+              }}
+            />
           </div>
 
           <div className="cj-modal-foot">
