@@ -1,0 +1,55 @@
+{
+  "name": "[KASSIELE] AUTOMACAO 3 - NOTIFICACAO MANUAL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notificar-pericia",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "id": "webhook-notificar-pericia",
+      "name": "Webhook (CRM)"
+    },
+    {
+      "parameters": {
+        "instanceName": "Kassiele Advocacia",
+        "remoteJid": "={{ $json.body.telefone }}@s.whatsapp.net",
+        "messageText": "=\u26a0\ufe0f *Olá, {{ $json.body.nome_cliente }}! Lembrete do Escritório da Dra. Kassiele:*\n\nPassando para lembrar que o seu agendamento de *{{ $json.body.titulo }}* está marcado para: *{{ $json.body.data }}* às *{{ $json.body.hora }}* no local *{{ $json.body.local }}*.\n\nQualquer dúvida, nos chame por aqui!",
+        "resource": "messages-api",
+        "operation": "send-text"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "id": "send-manual",
+      "name": "Enviar Notificação WhatsApp",
+      "credentials": {}
+    }
+  ],
+  "connections": {
+    "Webhook (CRM)": {
+      "main": [
+        [
+          {
+            "node": "Enviar Notificação WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/Sao_Paulo"
+  }
+}

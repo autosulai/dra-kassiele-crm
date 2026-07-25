@@ -431,6 +431,52 @@ function ClienteDetalhe({
     }
   };
 
+  const handleEnviarNotificacao = async (evento, e) => {
+    if (e) e.stopPropagation();
+    
+    if (evento.lembrete_enviado) return; // já enviado
+
+    const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/notificar-pericia';
+    
+    try {
+      // Atualização otimista na UI
+      setEventosCli(prev => prev.map(ev => ev.id === evento.id ? { ...ev, lembrete_enviado: true } : ev));
+      
+      const payload = {
+        evento_id: evento.id,
+        titulo: evento.titulo,
+        data: evento.data_hora ? new Date(evento.data_hora).toLocaleDateString('pt-BR') : 'Data a definir',
+        hora: evento.hora || (evento.data_hora ? new Date(evento.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : 'Horário a definir'),
+        local: evento.local || evento.local_tipo || 'INSS/Juízo',
+        nome_cliente: cliente.nome,
+        telefone: cliente.telefone || cliente.tel,
+      };
+
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error('Falha no webhook do n8n');
+      }
+
+      flash && flash('Notificação de perícia enviada com sucesso ao cliente!');
+
+      // Atualiza no Supabase
+      if (supabase && evento.id && !evento.id.startsWith('ev_')) {
+        await supabase.from('eventos_processuais').update({ lembrete_enviado: true }).eq('id', evento.id);
+      }
+      
+    } catch (err) {
+      console.error('Erro ao notificar via n8n:', err);
+      flash && flash('Erro ao enviar notificação. Verifique o console.');
+      // Reverte se deu erro
+      setEventosCli(prev => prev.map(ev => ev.id === evento.id ? { ...ev, lembrete_enviado: false } : ev));
+    }
+  };
+
   return (
     <div className="cj-cli-detalhe">
       <header className="cj-cli-det-head">
@@ -498,7 +544,19 @@ function ClienteDetalhe({
           {proximos.length > 0 ? proximos.map(a => (
             <div key={a.id} className="cj-cli-appt" onClick={() => onEdit(a)}>
               <div className="cj-cli-appt-time"><b>{a.hora || (a.data_hora ? new Date(a.data_hora).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '09:00')}</b><span>{fmtData(a.data_hora)}</span></div>
-              <div className="cj-cli-appt-main"><div>{a.titulo}</div><span>{nomeAdv(a.advogado || a.advogado_id)} · {a.local || 'INSS/Juízo'}</span></div>
+              <div className="cj-cli-appt-main" style={{ flex: 1 }}><div>{a.titulo}</div><span>{nomeAdv(a.advogado || a.advogado_id)} · {a.local || 'INSS/Juízo'}</span></div>
+              
+              <button 
+                className={`cj-btn sm ${a.lembrete_enviado ? 'ghost' : 'success'}`} 
+                onClick={(e) => handleEnviarNotificacao(a, e)}
+                style={{ marginLeft: 'auto', marginRight: '10px', fontSize: '11px', padding: '4px 10px', minWidth: '125px', justifyContent: 'center' }}
+                disabled={a.lembrete_enviado}
+                title={a.lembrete_enviado ? 'Notificação já enviada' : 'Disparar WhatsApp'}
+              >
+                <Icon name={a.lembrete_enviado ? "check" : "send"} size={12}/> 
+                {a.lembrete_enviado ? 'Enviado' : 'Notificar'}
+              </button>
+
               <Icon name="chevron" size={14}/>
             </div>
           )) : <div className="cj-empty-inline">Nenhuma perícia ou prazo registrado. <button onClick={() => onEdit()}>Abrir Prazos &amp; Perícias</button></div>}
