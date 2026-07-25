@@ -894,6 +894,7 @@ CREATE OR REPLACE VIEW vw_agenda_prazos AS
 SELECT
   e.id, e.escritorio_id, e.titulo, e.data_hora, e.duracao_min, e.status,
   e.local_tipo, e.local_detalhe, e.obs, e.lembrete_enviado, e.advogado_id,
+  e.cliente_id, e.lead_id, e.processo_id,
   t.slug AS tipo_slug, t.nome AS tipo_nome, t.cor AS tipo_cor,
   t.exige_presenca,
   COALESCE(c.nome, l.nome)         AS pessoa_nome,

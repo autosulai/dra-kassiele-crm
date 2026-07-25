@@ -102,11 +102,46 @@ export async function loadEventos() {
 
   try {
     const { data, error } = await supabase
-      .from('vw_agenda_prazos')
-      .select('*')
+      .from('eventos_processuais')
+      .select(`
+        *,
+        tipos_evento ( slug, nome, cor, exige_presenca ),
+        clientes ( nome, telefone ),
+        leads ( nome, telefone ),
+        processos ( numero_cnj, protocolo_inss, beneficio )
+      `)
       .order('data_hora', { ascending: true });
+      
     if (error) throw error;
-    return data && data.length > 0 ? data : eventosMock;
+    
+    if (data && data.length > 0) {
+      return data.map(e => ({
+        id: e.id,
+        escritorio_id: e.escritorio_id,
+        titulo: e.titulo,
+        data_hora: e.data_hora,
+        duracao_min: e.duracao_min,
+        status: e.status,
+        local_tipo: e.local_tipo,
+        local_detalhe: e.local_detalhe,
+        obs: e.obs,
+        lembrete_enviado: e.lembrete_enviado,
+        advogado_id: e.advogado_id,
+        cliente_id: e.cliente_id,
+        lead_id: e.lead_id,
+        processo_id: e.processo_id,
+        tipo_slug: e.tipos_evento?.slug,
+        tipo_nome: e.tipos_evento?.nome,
+        tipo_cor: e.tipos_evento?.cor,
+        exige_presenca: e.tipos_evento?.exige_presenca,
+        pessoa_nome: e.clientes?.nome || e.leads?.nome,
+        pessoa_telefone: e.clientes?.telefone || e.leads?.telefone,
+        numero_cnj: e.processos?.numero_cnj,
+        protocolo_inss: e.processos?.protocolo_inss,
+        beneficio: e.processos?.beneficio
+      }));
+    }
+    return eventosMock;
   } catch (err) {
     console.error('loadEventos:', err);
     return eventosMock;
