@@ -23,8 +23,9 @@
     },
     {
       "parameters": {
-        "operation": "rpc",
-        "functionName": "fn_fila_lembretes_evento"
+        "operation": "getAll",
+        "tableId": "vw_fila_lembretes_evento",
+        "limit": 100
       },
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -36,8 +37,8 @@
       "name": "Buscar Per\u00edcias em 2 Dias",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -45,7 +46,9 @@
       "parameters": {
         "instanceName": "Kassiele Advocacia",
         "remoteJid": "={{ $json.telefone }}@s.whatsapp.net",
-        "messageText": "=\u26a0\ufe0f *Aten\u00e7\u00e3o, {{ $json.nome }}! Lembrete da Dra. Kassiele:*\n\nSua **Per\u00edcia M\u00e9dica no INSS** est\u00e1 agendada para: **{{ $json.data_hora }}** na **{{ $json.local_detalhe }}**.\n\n\ud83d\udccc **ORIENTA\u00c7\u00d5ES OBRIGAT\u00d3RIAS:**\n1. Chegue com no m\u00ednimo 30 minutos de anteced\u00eancia.\n2. Leve **TODOS OS SEUS LAUDOS M\u00c9DICOS, ATESTADOS E RECEITAS ORIGINAIS** em m\u00e3os.\n3. Leve RG, CPF e Carteira de Trabalho originais."
+        "messageText": "=\u26a0\ufe0f *Aten\u00e7\u00e3o, {{ $json.nome }}! Lembrete da Dra. Kassiele:*\n\nSua **Per\u00edcia M\u00e9dica no INSS** est\u00e1 agendada para: **{{ $json.data_hora }}** na **{{ $json.local_detalhe }}**.\n\n\ud83d\udccc **ORIENTA\u00c7\u00d5ES OBRIGAT\u00d3RIAS:**\n1. Chegue com no m\u00ednimo 30 minutos de anteced\u00eancia.\n2. Leve **TODOS OS SEUS LAUDOS M\u00c9DICOS, ATESTADOS E RECEITAS ORIGINAIS** em m\u00e3os.\n3. Leve RG, CPF e Carteira de Trabalho originais.",
+        "resource": "messages-api",
+        "operation": "send-text"
       },
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
@@ -55,12 +58,7 @@
       ],
       "id": "send-pericia",
       "name": "Enviar Lembrete de Per\u00edcia",
-      "credentials": {
-        "evolutionApi": {
-          "id": "CRED_EVOLUTION_ID",
-          "name": "Kassiele Advocacia"
-        }
-      }
+      "credentials": {}
     }
   ],
   "connections": {

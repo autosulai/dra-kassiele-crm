@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "# MCP SERVER — TOOLS PREVIDENCIÁRIAS (INSS)",
+        "content": "# MCP SERVER \u2014 TOOLS PREVIDENCI\u00c1RIAS (INSS)",
         "height": 432,
         "width": 1560,
         "color": 5
@@ -47,7 +47,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Retorna o chassi 360° do lead: funil atual, etapa, checklist de documentos pendentes/recebidos, próximas perícias INSS agendadas e diretrizes internas (obs_interna). Chamar sempre no início da conversa.",
+        "toolDescription": "Retorna o chassi 360\u00b0 do lead: funil atual, etapa, checklist de documentos pendentes/recebidos, pr\u00f3ximas per\u00edcias INSS agendadas e diretrizes internas (obs_interna). Chamar sempre no in\u00edcio da conversa.",
         "operation": "getAll",
         "tableId": "leads",
         "limit": "=1",
@@ -56,7 +56,7 @@
             {
               "keyName": "telefone",
               "condition": "eq",
-              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas n\u00fameros','string') }}"
             }
           ]
         }
@@ -79,7 +79,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Classifica o segurado em um dos funis especializados após a pergunta sobre contribuição: 'BPC_LOAS' (não contribui/idoso/PCD) ou 'AUXILIO_DOENCA' (contribuinte com incapacidade).",
+        "toolDescription": "Classifica o segurado em um dos funis especializados ap\u00f3s a pergunta sobre contribui\u00e7\u00e3o: 'BPC_LOAS' (n\u00e3o contribui/idoso/PCD) ou 'AUXILIO_DOENCA' (contribuinte com incapacidade).",
         "operation": "update",
         "tableId": "leads",
         "filters": {
@@ -104,6 +104,10 @@
             {
               "fieldId": "contribuinte",
               "fieldValue": "={{ $fromAI('contribuinte','true ou false','boolean') }}"
+            },
+            {
+              "fieldId": "tag",
+              "fieldValue": "triado"
             }
           ]
         }
@@ -126,7 +130,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Atualiza os dados médicos e sociais coletados na triagem: tem_cadunico, doenca_relatada, ultima_contribuicao.",
+        "toolDescription": "Atualiza os dados m\u00e9dicos e sociais coletados na triagem: tem_cadunico, doenca_relatada, ultima_contribuicao.",
         "operation": "update",
         "tableId": "leads",
         "filters": {
@@ -146,7 +150,7 @@
             },
             {
               "fieldId": "doenca_relatada",
-              "fieldValue": "={{ $fromAI('doenca_relatada','Resumo do problema de saúde ou CID','string') }}"
+              "fieldValue": "={{ $fromAI('doenca_relatada','Resumo do problema de sa\u00fade ou CID','string') }}"
             }
           ]
         }
@@ -186,6 +190,10 @@
             {
               "fieldId": "etapa_slug",
               "fieldValue": "={{ $fromAI('etapa_slug','Slug da nova etapa','string') }}"
+            },
+            {
+              "fieldId": "tag",
+              "fieldValue": "={{ $fromAI('tag_slug', 'Nova tag do lead. Ex: documentos_pendentes', 'string') }}"
             }
           ]
         }
@@ -208,7 +216,7 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Consulta resumos processuais, laudos e peças que o advogado liberou explicitamente com a pílula verde (liberado_cliente = true) no CRM para informar ao cliente.",
+        "toolDescription": "Consulta resumos processuais, laudos e pe\u00e7as que o advogado liberou explicitamente com a p\u00edlula verde (liberado_cliente = true) no CRM para informar ao cliente.",
         "operation": "getAll",
         "tableId": "documentos_cliente",
         "limit": "=5",

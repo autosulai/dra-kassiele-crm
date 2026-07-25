@@ -23,8 +23,9 @@
     },
     {
       "parameters": {
-        "operation": "rpc",
-        "functionName": "fn_fila_followup"
+        "operation": "getAll",
+        "tableId": "vw_fila_followup",
+        "limit": 100
       },
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
@@ -36,8 +37,8 @@
       "name": "Buscar Fila de Follow-up",
       "credentials": {
         "supabaseApi": {
-          "id": "CRED_SUPABASE_ID",
-          "name": "Kassiele Advocacia"
+          "id": "FpRXEnaAxilvB0JI",
+          "name": "Dra. Kassiele"
         }
       }
     },
@@ -45,7 +46,9 @@
       "parameters": {
         "instanceName": "Kassiele Advocacia",
         "remoteJid": "={{ $json.telefone }}@s.whatsapp.net",
-        "messageText": "={{ $json.mensagem }}"
+        "messageText": "={{ $json.mensagem }}",
+        "resource": "messages-api",
+        "operation": "send-text"
       },
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
@@ -55,12 +58,7 @@
       ],
       "id": "send-followup",
       "name": "Enviar Cobran\u00e7a de Laudos",
-      "credentials": {
-        "evolutionApi": {
-          "id": "CRED_EVOLUTION_ID",
-          "name": "Kassiele Advocacia"
-        }
-      }
+      "credentials": {}
     }
   ],
   "connections": {

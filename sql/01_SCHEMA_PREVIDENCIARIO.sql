@@ -989,3 +989,11 @@ END $$;
 -- ============================================================================
 -- FIM DO SCHEMA. Execute agora 02_SEEDS_FUNIL.sql
 -- ============================================================================
+
+-- VIEWS PARA CONSUMO DO n8n (Substitui RPC por Get Many)
+CREATE OR REPLACE VIEW vw_fila_followup AS
+SELECT * FROM fn_fila_followup();
+
+CREATE OR REPLACE VIEW vw_fila_lembretes_evento AS
+SELECT * FROM fn_fila_lembretes_evento();
+

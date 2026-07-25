@@ -226,7 +226,7 @@ export const Processos = ({ casosList = casosInitial, clientesList = clientesIni
                 </div>
               </div>
 
-              <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+              <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
                 <div className="cj-field">
                   <label>Área Jurídica</label>
                   <select 
@@ -257,7 +257,9 @@ export const Processos = ({ casosList = casosInitial, clientesList = clientesIni
                     <option value="Arquivado / Indeferido">Arquivado / Indeferido</option>
                   </select>
                 </div>
+              </div>
 
+              <div className="cj-field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
                 <div className="cj-field">
                   <label>Próximo Prazo / Audiência</label>
                   <input 
@@ -266,6 +268,7 @@ export const Processos = ({ casosList = casosInitial, clientesList = clientesIni
                     onChange={e => setEditingProc({ ...editingProc, proximoPrazo: e.target.value })}
                   />
                 </div>
+                <div></div>
               </div>
 
               <div className="cj-field">
