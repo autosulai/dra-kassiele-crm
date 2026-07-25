@@ -441,6 +441,24 @@ export async function atualizarStatusEvento(eventoId, status) {
   }
 }
 
+export async function excluirEvento(eventoId) {
+  if (semSupabase()) {
+    const idx = eventosMock.findIndex(e => e.id === eventoId);
+    if (idx >= 0) {
+      eventosMock.splice(idx, 1);
+    }
+    return { ok: true, offline: true };
+  }
+  try {
+    const { error } = await supabase.from('eventos_processuais').delete().eq('id', eventoId);
+    if (error) throw error;
+    return { ok: true };
+  } catch (err) {
+    console.error('Erro ao excluir evento', err);
+    return { ok: false, error: err };
+  }
+}
+
 /** Salvar edições, adições, reordenação e remoção de etapas de um funil no Supabase e no mock. */
 export async function salvarEtapasKanban(funilId, etapas, deletedIds = []) {
   if (deletedIds.length > 0) {

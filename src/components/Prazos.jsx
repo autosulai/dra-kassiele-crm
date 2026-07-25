@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Icon } from './Icon';
-import { loadEventos, loadTiposEvento, salvarEvento, atualizarStatusEvento } from '../lib/funilService';
+import { loadEventos, loadTiposEvento, salvarEvento, atualizarStatusEvento, excluirEvento } from '../lib/funilService';
 
 /**
  * Prazos & Perícias
@@ -116,6 +116,12 @@ export const Prazos = ({ clientesList = [], casosList = [], advogados = [], targ
     await atualizarStatusEvento(ev.id, status);
   };
 
+  const handleExcluirPrazo = async (ev) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o prazo/perícia "${ev.titulo || ev.tipo_nome}"?\n\nAção irreversível.`)) return;
+    setEventos(prev => prev.filter(e => e.id !== ev.id));
+    await excluirEvento(ev.id);
+  };
+
   const gravar = async (dados) => {
     setEditor(null);
     await salvarEvento(dados);
@@ -209,6 +215,7 @@ export const Prazos = ({ clientesList = [], casosList = [], advogados = [], targ
                     onCumprido={() => mudarStatus(ev, 'cumprido')}
                     onPerdido={() => mudarStatus(ev, 'perdido')}
                     onEditar={() => setEditor(ev)}
+                    onExcluir={() => handleExcluirPrazo(ev)}
                   />
                 ))}
               </div>
@@ -238,7 +245,7 @@ export const Prazos = ({ clientesList = [], casosList = [], advogados = [], targ
 
 // ---------------------------------------------------------------------------
 
-const CardEvento = ({ evento, clientesMap = {}, casosMap = {}, advogadosMap = {}, onCumprido, onPerdido, onEditar }) => {
+const CardEvento = ({ evento, clientesMap = {}, casosMap = {}, advogadosMap = {}, onCumprido, onPerdido, onEditar, onExcluir }) => {
   const f = fmtDataHora(evento.data_hora);
   const d = diasAte(evento.data_hora);
   const aberto = evento.status === 'agendado';
@@ -301,6 +308,7 @@ const CardEvento = ({ evento, clientesMap = {}, casosMap = {}, advogadosMap = {}
             <button className="perigo" onClick={onPerdido}>Faltou</button>
           </>
         )}
+        <button onClick={onExcluir} title="Excluir Prazo/Perícia" style={{ color: 'rgba(239, 68, 68, 0.7)' }}><Icon name="trash" size={13}/></button>
         <button onClick={onEditar} title="Editar Prazo/Perícia"><Icon name="pencil" size={13}/></button>
       </div>
     </article>

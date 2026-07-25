@@ -701,7 +701,7 @@ a{color:var(--accent-ink)}a:hover{color:var(--accent)}
 .cj-fn-modal label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;
   text-transform:none;letter-spacing:0;color:var(--ink-2);min-width:0}
 .cj-fn-modal input,.cj-fn-modal select,.cj-fn-modal textarea{padding:9px 12px;border:1px solid var(--border);
-  border-radius:var(--r-sm);font-size:13.5px;background:var(--surface);outline:none;
+  border-radius:var(--r-sm);font-size:13.5px;background:var(--bg-2, #f9fafb);outline:none;
   font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink);width:100%;min-width:0}
 .cj-fn-modal input::placeholder,.cj-fn-modal select::placeholder,.cj-fn-modal textarea::placeholder{
   color:var(--ink-4);font-size:13px;font-weight:400;opacity:0.65}

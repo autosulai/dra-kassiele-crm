@@ -209,6 +209,7 @@ function ClienteDetalhe({
   onOpenNewClient
 }) {
   const [docsList, setDocsList] = useState(documentosCliente);
+  const [showDocModal, setShowDocModal] = useState(false);
   const [docForm, setDocForm] = useState({ titulo: '', tipo: 'andamento', conteudo_texto: '', arquivo_url: '', liberado_cliente: true, arquivo: null, arquivoNome: '', arquivoUrl: '' });
   const [showProcModal, setShowProcModal] = useState(false);
   const [editingProc, setEditingProc] = useState(null);
