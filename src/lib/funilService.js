@@ -553,14 +553,29 @@ export async function adicionarLeadKanban(dados) {
     const { data: escData } = await supabase.from('escritorio').select('id').limit(1);
     const escritorio_id = escData?.[0]?.id || null;
 
-    const { data, error } = await supabase.from('leads').insert([{
-      ...novoLead,
-      escritorio_id
-    }]).select('id').single();
+    const leadData = { ...novoLead, escritorio_id };
 
-    if (error) throw error;
+    let q = supabase.from('leads').select('id').eq('telefone', novoLead.telefone);
+    if (escritorio_id) {
+      q = q.eq('escritorio_id', escritorio_id);
+    } else {
+      q = q.is('escritorio_id', null);
+    }
 
-    return { ok: true, id: data.id, ...novoLead };
+    const { data: existente } = await q.limit(1);
+    let resultId;
+
+    if (existente && existente.length > 0) {
+      const { data, error } = await supabase.from('leads').update(leadData).eq('id', existente[0].id).select('id').single();
+      if (error) throw error;
+      resultId = data.id;
+    } else {
+      const { data, error } = await supabase.from('leads').insert([leadData]).select('id').single();
+      if (error) throw error;
+      resultId = data.id;
+    }
+
+    return { ok: true, id: resultId, ...novoLead };
   } catch (err) {
     console.error('adicionarLeadKanban erro:', err);
     return { ok: false, erro: err.message };

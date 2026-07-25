@@ -542,7 +542,8 @@ function ClienteDetalhe({
       setModalFunil(false);
       setTimeout(() => window.location.reload(), 800);
     } else {
-      flash && flash('Erro ao enviar para o funil.');
+      flash && flash('Erro ao enviar para o funil: ' + (rs.erro || 'Erro desconhecido.'));
+      console.error(rs.erro);
     }
   };
 
