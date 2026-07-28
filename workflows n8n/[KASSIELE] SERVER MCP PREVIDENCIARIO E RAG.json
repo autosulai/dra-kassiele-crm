@@ -104,10 +104,6 @@
             {
               "fieldId": "contribuinte",
               "fieldValue": "={{ $fromAI('contribuinte','true ou false','boolean') }}"
-            },
-            {
-              "fieldId": "tag",
-              "fieldValue": "triado"
             }
           ]
         }
