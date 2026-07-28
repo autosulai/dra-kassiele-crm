@@ -660,7 +660,7 @@ function ClienteDetalhe({
                 });
                 setShowEditModal(true);
               }} title="Editar Contato">
-                <Icon name="edit" size={16}/>
+                <Icon name="pencil" size={16}/>
               </button>
               <button className="cj-clean-btn" style={{ color: 'var(--live)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
                 <Icon name="trash" size={16}/>
