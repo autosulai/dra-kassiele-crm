@@ -54,7 +54,14 @@ export async function loadLeadsKanban() {
       .order('etapa_ordem', { ascending: true });
 
     if (error) throw error;
-    return data && data.length > 0 ? data : leadsMock;
+    
+    const normalizedData = (data || []).map(lead => ({
+      ...lead,
+      funil_slug: lead.funil_slug || 'INDEFINIDO',
+      etapa_slug: lead.etapa_slug || 'triagem'
+    }));
+    
+    return normalizedData.length > 0 ? normalizedData : leadsMock;
   } catch (err) {
     console.error('loadLeadsKanban:', err);
     return leadsMock;
