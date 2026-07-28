@@ -567,12 +567,32 @@ export async function adicionarLeadKanban(dados) {
 
     if (existente && existente.length > 0) {
       const { data, error } = await supabase.from('leads').update(leadData).eq('id', existente[0].id).select('id').single();
-      if (error) throw error;
-      resultId = data.id;
+      if (error) {
+        if (error.code === '23503' && error.message.includes('cliente_id')) {
+          leadData.cliente_id = null;
+          const { data: d2, error: e2 } = await supabase.from('leads').update(leadData).eq('id', existente[0].id).select('id').single();
+          if (e2) throw e2;
+          resultId = d2.id;
+        } else {
+          throw error;
+        }
+      } else {
+        resultId = data.id;
+      }
     } else {
       const { data, error } = await supabase.from('leads').insert([leadData]).select('id').single();
-      if (error) throw error;
-      resultId = data.id;
+      if (error) {
+        if (error.code === '23503' && error.message.includes('cliente_id')) {
+          leadData.cliente_id = null;
+          const { data: d2, error: e2 } = await supabase.from('leads').insert([leadData]).select('id').single();
+          if (e2) throw e2;
+          resultId = d2.id;
+        } else {
+          throw error;
+        }
+      } else {
+        resultId = data.id;
+      }
     }
 
     return { ok: true, id: resultId, ...novoLead };
