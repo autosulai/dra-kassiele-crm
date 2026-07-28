@@ -818,11 +818,12 @@ function ClienteDetalhe({
           
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
             <button 
-              className="cj-btn primary" 
+              className="cj-btn" 
               onClick={handleEnviarAssinatura}
               disabled={enviandoAssinatura}
+              style={{ backgroundColor: '#25D366', color: 'white', borderColor: '#25D366' }}
             >
-              <Icon name="send" size={14}/> {enviandoAssinatura ? 'Enviando...' : 'Enviar para o Cliente (WhatsApp)'}
+              <Icon name="whatsapp" size={14}/> {enviandoAssinatura ? 'Enviando...' : 'Enviar para o Cliente (WhatsApp)'}
             </button>
           </div>
         </section>
