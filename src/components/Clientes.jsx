@@ -1267,16 +1267,54 @@ function ClienteDetalhe({
             <form onSubmit={async (e) => {
               e.preventDefault();
               setSalvandoEdicao(true);
-              const atualizado = { ...cliente, ...editForm, tel: editForm.telefone, doc: editForm.doc };
+              let atualizado = { ...cliente, ...editForm, tel: editForm.telefone, doc: editForm.doc };
               
               if (supabase && cliente.id && !cliente.id.startsWith('c_')) {
                 try {
-                  await supabase.from('clientes').update({
-                    nome: editForm.nome,
-                    telefone: editForm.telefone,
-                    email: editForm.email,
-                    doc_cpf_cnpj: editForm.doc
-                  }).eq('id', cliente.id);
+                  const { data: cData } = await supabase.from('clientes').select('id').eq('id', cliente.id).maybeSingle();
+                  
+                  if (cData) {
+                    await supabase.from('clientes').update({
+                      nome: editForm.nome,
+                      telefone: editForm.telefone,
+                      email: editForm.email,
+                      doc_cpf_cnpj: editForm.doc
+                    }).eq('id', cliente.id);
+                    
+                    await supabase.from('leads').update({
+                      nome: editForm.nome,
+                      telefone: editForm.telefone,
+                      cpf: editForm.doc
+                    }).eq('cliente_id', cliente.id);
+                  } else {
+                    const { data: escList } = await supabase.from('escritorio').select('id').limit(1);
+                    const escritorio_id = escList?.[0]?.id || null;
+                    
+                    const { data: novoCliente, error: insErr } = await supabase.from('clientes').insert([{
+                      escritorio_id,
+                      nome: editForm.nome,
+                      telefone: editForm.telefone,
+                      email: editForm.email,
+                      doc_cpf_cnpj: editForm.doc,
+                      status: 'lead'
+                    }]).select('id').maybeSingle();
+
+                    if (novoCliente) {
+                      await supabase.from('leads').update({ 
+                        cliente_id: novoCliente.id,
+                        nome: editForm.nome,
+                        telefone: editForm.telefone,
+                        cpf: editForm.doc
+                      }).eq('id', cliente.id);
+                      atualizado.id = novoCliente.id;
+                    } else {
+                      await supabase.from('leads').update({
+                        nome: editForm.nome,
+                        telefone: editForm.telefone,
+                        cpf: editForm.doc
+                      }).eq('id', cliente.id);
+                    }
+                  }
                 } catch (err) {
                   console.error('Erro ao editar:', err);
                 }
