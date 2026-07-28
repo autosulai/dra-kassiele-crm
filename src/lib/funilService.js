@@ -36,7 +36,6 @@ export async function loadFunis() {
 
 function montarArvore(funis, etapas) {
   return funis
-    .filter(f => f.slug !== 'INDEFINIDO')
     .map(f => ({
       ...f,
       etapas: etapas.filter(e => e.funil_id === f.id).sort((a, b) => a.ordem - b.ordem)
