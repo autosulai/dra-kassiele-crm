@@ -222,6 +222,11 @@ function ClienteDetalhe({
   const [modalFunil, setModalFunil] = useState(false);
   const [formFunil, setFormFunil] = useState({ funil_slug: '', etapa_slug: '' });
 
+  // -- Edicao Contato --
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({ nome: '', telefone: '', email: '', doc: '' });
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+
   // -- Assinatura --
   const [docAssinaturaUrl, setDocAssinaturaUrl] = useState('');
   const [docAssinaturaTitulo, setDocAssinaturaTitulo] = useState('');
@@ -594,11 +599,18 @@ function ClienteDetalhe({
       flash && flash('Selecione um funil e uma etapa.');
       return;
     }
+    const tel = cliente.tel || cliente.telefone;
+    if (!tel) {
+      flash && flash('O cliente precisa ter um telefone para entrar no funil.');
+      return;
+    }
+    const isUuid = cliente?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cliente.id);
+    
     flash && flash('Adicionando ao funil...');
     const rs = await adicionarLeadKanban({
       nome: cliente.nome,
-      telefone: cliente.tel || cliente.telefone,
-      cliente_id: cliente.id,
+      telefone: tel,
+      cliente_id: isUuid ? cliente.id : null,
       funil_slug: formFunil.funil_slug,
       etapa_slug: formFunil.etapa_slug
     });
@@ -638,9 +650,22 @@ function ClienteDetalhe({
         <section className="cj-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <h3 style={{ margin: 0 }}>Contato</h3>
-            <button className="cj-clean-btn" style={{ color: 'var(--live)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
-              <Icon name="trash" size={16}/>
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="cj-clean-btn" style={{ color: 'var(--ink-2)', opacity: 0.7, padding: '4px' }} onClick={() => {
+                setEditForm({
+                  nome: cliente.nome || '',
+                  telefone: cliente.tel || cliente.telefone || '',
+                  email: cliente.email || '',
+                  doc: cliente.doc || cliente.cpf || ''
+                });
+                setShowEditModal(true);
+              }} title="Editar Contato">
+                <Icon name="edit" size={16}/>
+              </button>
+              <button className="cj-clean-btn" style={{ color: 'var(--live)', opacity: 0.7, padding: '4px' }} onClick={() => setConfirmDelete(true)} title="Excluir Cliente">
+                <Icon name="trash" size={16}/>
+              </button>
+            </div>
           </div>
           <div className="cj-fields">
             <div><label>Telefone</label><span>{cliente.tel || '—'}</span></div>
@@ -1226,6 +1251,68 @@ function ClienteDetalhe({
                   Sim, Excluir
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="cj-fn-modal-bg" onClick={() => setShowEditModal(false)} style={{ zIndex: 100 }}>
+          <div className="cj-fn-modal" onClick={e => e.stopPropagation()} style={{ width: '400px' }}>
+            <div className="cj-modal-head" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--ink-1)' }}>Editar Contato</h3>
+              </div>
+              <button className="cj-clean-btn" onClick={() => setShowEditModal(false)}><Icon name="x" size={16}/></button>
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setSalvandoEdicao(true);
+              const atualizado = { ...cliente, ...editForm, tel: editForm.telefone, doc: editForm.doc };
+              
+              if (supabase && cliente.id && !cliente.id.startsWith('c_')) {
+                try {
+                  await supabase.from('clientes').update({
+                    nome: editForm.nome,
+                    telefone: editForm.telefone,
+                    email: editForm.email,
+                    doc_cpf_cnpj: editForm.doc
+                  }).eq('id', cliente.id);
+                } catch (err) {
+                  console.error('Erro ao editar:', err);
+                }
+              }
+              
+              if (onEdit && typeof onEdit === 'function') {
+                onEdit(atualizado, 'atualizar_cliente');
+              }
+              
+              flash && flash('Informações atualizadas com sucesso!');
+              setShowEditModal(false);
+              setSalvandoEdicao(false);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>Nome Completo</label>
+                <input className="cj-input" required value={editForm.nome} onChange={e => setEditForm({ ...editForm, nome: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>Telefone (WhatsApp)</label>
+                <input className="cj-input" required value={editForm.telefone} onChange={e => setEditForm({ ...editForm, telefone: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>E-mail</label>
+                <input className="cj-input" type="email" value={editForm.email} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '600', color: 'var(--ink-3)', textTransform: 'uppercase' }}>CPF / CNPJ</label>
+                <input className="cj-input" value={editForm.doc} onChange={e => setEditForm({ ...editForm, doc: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                <button type="button" className="cj-btn" onClick={() => setShowEditModal(false)}>Cancelar</button>
+                <button type="submit" className="cj-btn primary" disabled={salvandoEdicao}>
+                  {salvandoEdicao ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
