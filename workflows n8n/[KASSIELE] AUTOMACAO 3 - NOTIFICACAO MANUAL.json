@@ -19,6 +19,26 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.tipo }}",
+              "value2": "assinatura"
+            }
+          ]
+        }
+      },
+      "name": "É Assinatura?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ],
+      "id": "if-tipo"
+    },
+    {
+      "parameters": {
         "instanceName": "Kassiele Advocacia",
         "remoteJid": "={{ $json.body.telefone }}@s.whatsapp.net",
         "messageText": "=\u26a0\ufe0f *Olá, {{ $json.body.nome_cliente }}! Lembrete do Escritório da Dra. Kassiele:*\n\nPassando para lembrar que o seu agendamento de *{{ $json.body.titulo }}* está marcado para: *{{ $json.body.data }}* às *{{ $json.body.hora }}* no local *{{ $json.body.local }}*.\n{{ $json.body.endereco ? '\\n\\ud83d\\udccd *Endereço/Link:* ' + $json.body.endereco + '\\n' : '' }}{{ $json.body.obs ? '\\n\\ud83d\\udccc *Obs:* ' + $json.body.obs + '\\n' : '' }}\nQualquer dúvida, nos chame por aqui!",
@@ -28,11 +48,29 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        460,
-        300
+        600,
+        420
       ],
       "id": "send-manual",
-      "name": "Enviar Notificação WhatsApp",
+      "name": "Enviar Notificação WhatsApp (Prazo)",
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "instanceName": "Kassiele Advocacia",
+        "remoteJid": "={{ $json.body.telefone }}@s.whatsapp.net",
+        "messageText": "=\u26a0\ufe0f *Olá, {{ $json.body.nome_cliente }}!*\n\nTemos um documento aguardando a sua assinatura no sistema do Escritório da Dra. Kassiele.\n\n*Documento:* {{ $json.body.titulo.replace('Assinatura de Documento: ', '') }}\n\n\ud83d\udccd *Link para Assinar:* {{ $json.body.endereco }}\n\n{{ $json.body.obs ? '\\ud83d\\udccc *Instruções:* ' + $json.body.obs + '\\n\\n' : '' }}Qualquer dúvida na hora de assinar, nos chame por aqui!",
+        "resource": "messages-api",
+        "operation": "send-text"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        600,
+        220
+      ],
+      "id": "send-assinatura",
+      "name": "Enviar Assinatura WhatsApp",
       "credentials": {}
     }
   ],
@@ -41,7 +79,25 @@
       "main": [
         [
           {
-            "node": "Enviar Notificação WhatsApp",
+            "node": "É Assinatura?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "É Assinatura?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Assinatura WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar Notificação WhatsApp (Prazo)",
             "type": "main",
             "index": 0
           }

@@ -486,6 +486,7 @@ function ClienteDetalhe({
         obs: evento.obs || '',
         nome_cliente: cliente.nome,
         telefone: cliente.telefone || cliente.tel,
+        tipo: 'prazo'
       };
 
       const res = await fetch(webhookUrl, {
@@ -545,6 +546,7 @@ function ClienteDetalhe({
         obs: 'Por favor, assine o documento acessando o link acima.',
         nome_cliente: cliente.nome,
         telefone: cliente.telefone || cliente.tel,
+        tipo: 'assinatura'
       };
 
       const res = await fetch(webhookUrl, {
@@ -584,6 +586,8 @@ function ClienteDetalhe({
   const handleApagarCliente = async () => {
     if (supabase && cliente?.id && !cliente.id.startsWith('c_')) {
       try {
+        await supabase.from('leads').delete().eq('id', cliente.id);
+        await supabase.from('leads').delete().eq('cliente_id', cliente.id);
         await supabase.from('clientes').delete().eq('id', cliente.id);
       } catch(err) {
         console.error('Erro ao apagar:', err);
@@ -612,7 +616,8 @@ function ClienteDetalhe({
       telefone: tel,
       cliente_id: isUuid ? cliente.id : null,
       funil_slug: formFunil.funil_slug,
-      etapa_slug: formFunil.etapa_slug
+      etapa_slug: formFunil.etapa_slug,
+      status: 'aberto'
     });
     if (rs.ok) {
       flash && flash('Cliente enviado para o funil com sucesso!');
