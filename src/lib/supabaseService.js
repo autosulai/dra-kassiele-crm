@@ -13,49 +13,63 @@ async function mesclarLeadsAosClientes(listaClientes, listaCasos) {
     const clientesFinal = [...listaClientes];
     const casosFinal = [...listaCasos];
 
-    const cIds = new Set(clientesFinal.map(c => c && c.id));
-    const cCpfs = new Set(clientesFinal.map(c => c && c.doc).filter(d => d && d !== '—'));
+    const cIds = new Map();
+    const cCpfs = new Map();
+    const cTels = new Map();
+
+    clientesFinal.forEach(c => {
+      if (!c) return;
+      if (c.id) cIds.set(c.id, c);
+      if (c.doc && c.doc !== '—') cCpfs.set(c.doc.replace(/\\D/g, ''), c);
+      if (c.tel && c.tel !== '—') cTels.set(c.tel.replace(/\\D/g, ''), c);
+    });
 
     leads.forEach(l => {
       if (!l || !l.id) return;
       
-      // Se o lead tem um cliente_id que já existe na lista, atualizamos o cliente e não duplicamos
+      let cExistente = null;
       if (l.cliente_id && cIds.has(l.cliente_id)) {
-        const cExistente = clientesFinal.find(c => c.id === l.cliente_id);
-        if (cExistente) {
-          cExistente.origem = `Funil (${l.etapa_nome || 'Triagem'})`;
-          cExistente.etapa_nome = l.etapa_nome;
-          cExistente.funil_slug = l.funil_slug;
-          if (cExistente.status !== 'ativo' && l.status === 'aberto') {
-            cExistente.status = 'lead';
-          }
+        cExistente = cIds.get(l.cliente_id);
+      } else if (l.cpf && cCpfs.has(l.cpf.replace(/\\D/g, ''))) {
+        cExistente = cCpfs.get(l.cpf.replace(/\\D/g, ''));
+      } else if (l.telefone && cTels.has(l.telefone.replace(/\\D/g, ''))) {
+        cExistente = cTels.get(l.telefone.replace(/\\D/g, ''));
+      }
+
+      // Se o lead corresponde a um cliente que já existe na lista, atualizamos o cliente e não duplicamos
+      if (cExistente) {
+        cExistente.origem = `Funil (${l.etapa_nome || 'Triagem'})`;
+        cExistente.etapa_nome = l.etapa_nome;
+        cExistente.funil_slug = l.funil_slug;
+        if (cExistente.status !== 'ativo' && l.status === 'aberto') {
+          cExistente.status = 'lead';
         }
         return;
       }
       
       // Se não, criamos um novo cliente fake na UI para o lead aparecer
-      if (!cIds.has(l.cliente_id) && (!l.cpf || !cCpfs.has(l.cpf))) {
-        const novoId = l.cliente_id || l.id;
-        cIds.add(novoId);
-        if (l.cpf) cCpfs.add(l.cpf);
-        clientesFinal.push({
-          id: novoId,
-          nome: l.nome || 'Lead do Funil',
-          tipo: 'PF',
-          doc: l.cpf || '—',
-          tel: l.telefone || '—',
-          email: l.email || `${(l.nome||'cliente').toLowerCase().replace(/[^a-z0-9]/g, '.')}@email.com`,
-          advogado: l.advogado_id || 'a1',
-          area: l.funil_nome || 'Previdenciário',
-          casos: l.protocolo_inss ? 1 : 0,
-          status: l.status === 'aberto' ? 'lead' : (l.status === 'ganho' ? 'ativo' : 'encerrado'),
-          desde: l.criado_em ? new Date(l.criado_em).toLocaleDateString('pt-BR') : 'Hoje',
-          origem: `Funil (${l.etapa_nome || 'Triagem'})`,
-          etapa_nome: l.etapa_nome,
-          funil_slug: l.funil_slug,
-          protocolo_inss: l.protocolo_inss
-        });
-      }
+      const novoId = l.cliente_id || l.id;
+      cIds.set(novoId, { id: novoId }); // just to prevent same lead duplicating
+      if (l.cpf) cCpfs.set(l.cpf.replace(/\\D/g, ''), { id: novoId });
+      if (l.telefone) cTels.set(l.telefone.replace(/\\D/g, ''), { id: novoId });
+      
+      clientesFinal.push({
+        id: novoId,
+        nome: l.nome || 'Lead do Funil',
+        tipo: 'PF',
+        doc: l.cpf || '—',
+        tel: l.telefone || '—',
+        email: l.email || `${(l.nome||'cliente').toLowerCase().replace(/[^a-z0-9]/g, '.')}@email.com`,
+        advogado: l.advogado_id || 'a1',
+        area: l.funil_nome || 'Previdenciário',
+        casos: l.protocolo_inss ? 1 : 0,
+        status: l.status === 'aberto' ? 'lead' : (l.status === 'ganho' ? 'ativo' : 'encerrado'),
+        desde: l.criado_em ? new Date(l.criado_em).toLocaleDateString('pt-BR') : 'Hoje',
+        origem: `Funil (${l.etapa_nome || 'Triagem'})`,
+        etapa_nome: l.etapa_nome,
+        funil_slug: l.funil_slug,
+        protocolo_inss: l.protocolo_inss
+      });
     });
 
     const pIds = new Set(casosFinal.map(p => p && p.id));
