@@ -221,6 +221,14 @@ function ClienteDetalhe({
   const [funis, setFunis] = useState([]);
   const [modalFunil, setModalFunil] = useState(false);
   const [formFunil, setFormFunil] = useState({ funil_slug: '', etapa_slug: '' });
+
+  // -- Assinatura --
+  const [docAssinaturaUrl, setDocAssinaturaUrl] = useState('');
+  const [docAssinaturaTitulo, setDocAssinaturaTitulo] = useState('');
+  const [docAssinaturaFile, setDocAssinaturaFile] = useState(null);
+  const [docAssinaturaFileNome, setDocAssinaturaFileNome] = useState('');
+  const [enviandoAssinatura, setEnviandoAssinatura] = useState(false);
+
   
   useEffect(() => {
     loadTiposEvento().then(setTiposEvento).catch(console.error);
@@ -500,6 +508,63 @@ function ClienteDetalhe({
     }
   };
 
+  const handleEnviarAssinatura = async () => {
+    if (!docAssinaturaUrl && !docAssinaturaFile) {
+      flash && flash('Adicione um arquivo ou link para assinatura.');
+      return;
+    }
+    if (!docAssinaturaTitulo.trim()) {
+      flash && flash('Adicione um título para o documento.');
+      return;
+    }
+    
+    setEnviandoAssinatura(true);
+    let finalUrl = docAssinaturaUrl;
+    
+    try {
+      if (docAssinaturaFile) {
+        flash && flash('Fazendo upload do documento...');
+        const respUrl = await uploadArquivoSupabase(docAssinaturaFile, 'clientes_docs');
+        if (respUrl) finalUrl = respUrl;
+      }
+      
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/notificar-pericia';
+      
+      const payload = {
+        evento_id: 'assinatura_' + Date.now(),
+        titulo: `Assinatura de Documento: ${docAssinaturaTitulo}`,
+        data: new Date().toLocaleDateString('pt-BR'),
+        hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}),
+        local: 'Online',
+        endereco: finalUrl,
+        obs: 'Por favor, assine o documento acessando o link acima.',
+        nome_cliente: cliente.nome,
+        telefone: cliente.telefone || cliente.tel,
+      };
+
+      const res = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        throw new Error('Falha no webhook do n8n');
+      }
+
+      flash && flash('Documento enviado para assinatura com sucesso!');
+      setDocAssinaturaUrl('');
+      setDocAssinaturaTitulo('');
+      setDocAssinaturaFile(null);
+      setDocAssinaturaFileNome('');
+    } catch (err) {
+      console.error('Erro ao enviar assinatura:', err);
+      flash && flash('Erro ao enviar assinatura. Tente novamente.');
+    } finally {
+      setEnviandoAssinatura(false);
+    }
+  };
+
   const handleEnviarNotificacao = (evento, e) => {
     if (e) e.stopPropagation();
     
@@ -653,6 +718,113 @@ function ClienteDetalhe({
               <Icon name="chevron" size={14}/>
             </div>
           )) : <div className="cj-empty-inline">Nenhuma perícia ou prazo registrado. <button onClick={() => onEdit()}>Abrir Prazos &amp; Perícias</button></div>}
+        </section>
+
+        <section className="cj-card span-2">
+          <div className="cj-card-head">
+            <div>
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                <Icon name="file-text" size={16} style={{ color: 'var(--accent)' }}/> Documento para Assinatura
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--ink-3)', marginTop: '4px', marginBottom: 0 }}>
+                Envie um documento ou link para o cliente assinar via WhatsApp.
+              </p>
+            </div>
+          </div>
+          <div className="cj-fields" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
+            <div className="cj-field">
+              <label>Título do Documento</label>
+              <input 
+                type="text" 
+                placeholder="Ex: Procuração, Contrato de Honorários" 
+                value={docAssinaturaTitulo}
+                onChange={e => setDocAssinaturaTitulo(e.target.value)}
+              />
+            </div>
+            
+            <div className="cj-field" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label>Link ou Arquivo para Assinatura</label>
+              
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <input 
+                  type="text" 
+                  placeholder="Cole o link (Ex: Clicksign)" 
+                  value={docAssinaturaUrl}
+                  onChange={e => setDocAssinaturaUrl(e.target.value)}
+                  disabled={!!docAssinaturaFile}
+                  style={{ flex: 1 }}
+                />
+                
+                <span style={{ fontSize: '11px', color: 'var(--ink-4)', fontWeight: '600' }}>OU</span>
+                
+                <input
+                  type="file"
+                  id="file-upload-assinatura"
+                  style={{ display: 'none' }}
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setDocAssinaturaFile(file);
+                      setDocAssinaturaFileNome(file.name);
+                      if (!docAssinaturaTitulo) {
+                         setDocAssinaturaTitulo(file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '));
+                      }
+                    }
+                  }}
+                  disabled={!!docAssinaturaUrl}
+                />
+                <label
+                  htmlFor={docAssinaturaUrl ? "" : "file-upload-assinatura"}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '9px 12px',
+                    borderRadius: '8px',
+                    border: docAssinaturaFileNome ? '1px solid var(--accent)' : '1px dashed var(--border-2)',
+                    background: docAssinaturaFileNome ? 'rgba(99, 102, 241, 0.08)' : 'var(--surface-2, rgba(0,0,0,0.02))',
+                    cursor: docAssinaturaUrl ? 'not-allowed' : 'pointer',
+                    opacity: docAssinaturaUrl ? 0.5 : 1,
+                    color: docAssinaturaFileNome ? 'var(--accent)' : 'var(--ink-3)',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    minWidth: '150px',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Icon name={docAssinaturaFileNome ? 'file-text' : 'upload'} size={14}/>
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '120px' }}>
+                    {docAssinaturaFileNome || 'Upload de Arquivo'}
+                  </span>
+                </label>
+                {docAssinaturaFileNome && (
+                  <button
+                    className="cj-btn ghost"
+                    style={{ padding: '6px', color: 'var(--live)' }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setDocAssinaturaFile(null);
+                      setDocAssinaturaFileNome('');
+                    }}
+                    title="Remover arquivo"
+                  >
+                    <Icon name="x" size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+            <button 
+              className="cj-btn primary" 
+              onClick={handleEnviarAssinatura}
+              disabled={enviandoAssinatura}
+            >
+              <Icon name="send" size={14}/> {enviandoAssinatura ? 'Enviando...' : 'Enviar para o Cliente (WhatsApp)'}
+            </button>
+          </div>
         </section>
 
         <section className="cj-card span-2">
