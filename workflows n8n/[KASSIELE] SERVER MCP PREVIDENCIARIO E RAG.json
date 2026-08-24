@@ -87,7 +87,7 @@
             {
               "keyName": "telefone",
               "condition": "eq",
-              "keyValue": "={{ $fromAI('telefone','Telefone do segurado','string') }}"
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
             }
           ]
         },
@@ -134,7 +134,7 @@
             {
               "keyName": "telefone",
               "condition": "eq",
-              "keyValue": "={{ $fromAI('telefone','Telefone','string') }}"
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
             }
           ]
         },
@@ -177,7 +177,7 @@
             {
               "keyName": "telefone",
               "condition": "eq",
-              "keyValue": "={{ $fromAI('telefone','Telefone','string') }}"
+              "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
             }
           ]
         },
@@ -186,10 +186,6 @@
             {
               "fieldId": "etapa_slug",
               "fieldValue": "={{ $fromAI('etapa_slug','Slug da nova etapa','string') }}"
-            },
-            {
-              "fieldId": "tag",
-              "fieldValue": "={{ $fromAI('tag_slug', 'Nova tag do lead. Ex: documentos_pendentes', 'string') }}"
             }
           ]
         }

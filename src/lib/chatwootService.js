@@ -54,22 +54,24 @@ export async function abrirConversaChatwoot(telefone, flash) {
   if (!info || !token || !digits) { fallback(); return; }
 
   try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const proxyUrl = `${supabaseUrl}/functions/v1/chatwoot-proxy?url=`;
+
     const headers = { api_access_token: token };
+    
     // 1) acha o contato pelo telefone
-    const rc = await fetch(
-      `${info.origin}/api/v1/accounts/${info.accountId}/contacts/search?q=${encodeURIComponent(digits)}`,
-      { headers }
-    );
+    const searchTarget = encodeURIComponent(`${info.origin}/api/v1/accounts/${info.accountId}/contacts/search?q=${encodeURIComponent(digits)}`);
+    const rc = await fetch(proxyUrl + searchTarget, { headers });
+    
     if (!rc.ok) throw new Error('search falhou');
     const jc = await rc.json();
     const contato = jc?.payload?.[0];
     if (!contato) { fallback('Contato ainda não existe no Chatwoot — abri a caixa de entrada.'); return; }
 
     // 2) acha a conversa mais recente do contato
-    const rk = await fetch(
-      `${info.origin}/api/v1/accounts/${info.accountId}/contacts/${contato.id}/conversations`,
-      { headers }
-    );
+    const convTarget = encodeURIComponent(`${info.origin}/api/v1/accounts/${info.accountId}/contacts/${contato.id}/conversations`);
+    const rk = await fetch(proxyUrl + convTarget, { headers });
+    
     if (!rk.ok) throw new Error('conversations falhou');
     const jk = await rk.json();
     const conv = jk?.payload?.[0];
