@@ -179,7 +179,7 @@
               "condition": "eq",
               "keyValue": "={{ $fromAI('telefone','Telefone do segurado apenas números','string') }}"
             }
-          ]
+          ] 
         },
         "fieldsUi": {
           "fieldValues": [
