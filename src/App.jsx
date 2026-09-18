@@ -152,11 +152,12 @@ export function App() {
   const [prazosTarget, setPrazosTarget] = useState(null);
 
   const handleGoToChat = (leadOrClient) => {
-    const tel = leadOrClient?.telefone || leadOrClient?.tel;
+    const rawTel = leadOrClient?.telefone || leadOrClient?.tel || '';
+    const tel = rawTel.replace(/\D/g, '');
     if (tel) {
-      abrirConversaChatwoot(tel, (msg) => console.log('Chatwoot:', msg));
+      window.open(`https://wa.me/${tel}`, '_blank');
     } else {
-      abrirConversas((msg) => console.log('Chatwoot:', msg));
+      console.log('Cliente sem telefone cadastrado.');
     }
   };
 

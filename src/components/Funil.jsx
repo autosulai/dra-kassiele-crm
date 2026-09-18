@@ -1002,8 +1002,8 @@ const DetalheLead = ({
         )}
 
         <footer className="cj-fn-drawer-foot">
-          <button className="cj-fn-btn-primario" onClick={onChat}>
-            <Icon name="send" size={14}/> Abrir conversa
+          <button className="cj-fn-btn-primario" onClick={onChat} style={{ background: '#25D366', borderColor: '#25D366', color: '#fff' }}>
+            <Icon name="whatsapp" size={14}/> WhatsApp
           </button>
           <button className="cj-fn-btn-perigo" onClick={onPerder}>
             Encerrar lead

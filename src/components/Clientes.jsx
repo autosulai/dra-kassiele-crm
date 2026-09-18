@@ -6,7 +6,7 @@ import { ModalNovaTag } from './ModalNovaTag';
 import { supabase } from '../lib/supabase';
 import { loadEventos, loadTiposEvento, salvarEvento, loadFunis, adicionarLeadKanban } from '../lib/funilService';
 import { uploadArquivoSupabase } from '../lib/supabaseService';
-import { abrirConversaChatwoot } from '../lib/chatwootService';
+
 import { EditorPrazo } from './Prazos';
 
 export const Clientes = ({ clientesList = clientes, casosList = casos, onUpdateCasos, onEdit, onUpdateCliente, onAddCliente, targetClient, aiName = configIA.nome || 'Sofia', tagsLista: tagsListaProp, onAddTag, escritorioState }) => {
@@ -226,6 +226,10 @@ function ClienteDetalhe({
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ nome: '', telefone: '', email: '', doc: '' });
   const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+
+  // -- Observacoes --
+  const [showObsModal, setShowObsModal] = useState(false);
+  const [obsForm, setObsForm] = useState({ titulo: '', texto: '' });
 
   // -- Assinatura --
   const [docAssinaturaUrl, setDocAssinaturaUrl] = useState('');
@@ -645,8 +649,12 @@ function ClienteDetalhe({
         </div>
         <div className="cj-cli-det-actions">
           <button className="cj-btn ghost"><Icon name="phone" size={13}/> Ligar</button>
-          <button className="cj-btn ghost"><Icon name="mail" size={13}/> E-mail</button>
-          <button className="cj-btn ghost" onClick={() => abrirConversaChatwoot(cliente.tel || cliente.telefone, flash)} title="Abrir a conversa deste cliente no Chatwoot"><Icon name="external" size={13}/> Chatwoot</button>
+          <button className="cj-btn ghost" onClick={() => setShowObsModal(true)}><Icon name="pencil" size={13}/> Observação</button>
+          <button className="cj-btn ghost" onClick={() => {
+            const tel = (cliente.tel || cliente.telefone || '').replace(/\D/g, '');
+            if (tel) window.open(`https://wa.me/${tel}`, '_blank');
+            else if (flash) flash('Cliente sem telefone cadastrado.');
+          }} title="Abrir conversa no WhatsApp"><Icon name="whatsapp" size={13}/> WhatsApp</button>
           <button className="cj-btn primary" onClick={() => onOpenNewClient()}><Icon name="plus" size={13}/> Novo Cliente</button>
         </div>
       </header>
@@ -962,7 +970,96 @@ function ClienteDetalhe({
             )}
           </div>
         </section>
+
+        <section className="cj-card" style={{ gridColumn: '1 / -1' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <h3 style={{ margin: 0 }}>Observações</h3>
+            <button className="cj-btn primary" onClick={() => setShowObsModal(true)}>
+              <Icon name="plus" size={12}/> Nova Observação
+            </button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            {cliente.observacoes && cliente.observacoes.length > 0 ? cliente.observacoes.map((obs, idx) => (
+              <div key={idx} style={{ padding: '14px', border: '1px solid var(--border-2)', borderRadius: '10px', background: 'var(--surface)' }}>
+                <h4 style={{ margin: '0 0 6px 0', fontSize: '14px', color: 'var(--ink)' }}>{obs.titulo}</h4>
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--ink-2)', whiteSpace: 'pre-wrap' }}>{obs.texto}</p>
+                <div style={{ fontSize: '11px', color: 'var(--ink-3)', marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>{obs.data}</span>
+                  <button className="cj-clean-btn" style={{ color: 'var(--live)', opacity: 0.7 }} onClick={() => {
+                    const novas = cliente.observacoes.filter((_, i) => i !== idx);
+                    if (onEdit) onEdit({ ...cliente, observacoes: novas }, 'atualizar_cliente');
+                    flash && flash('Observação removida.');
+                    
+                    if (supabase && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cliente.id)) {
+                      supabase.from('clientes').update({ observacoes: novas }).eq('id', cliente.id).catch(console.error);
+                    }
+                  }} title="Excluir observação">
+                    <Icon name="trash" size={12}/>
+                  </button>
+                </div>
+              </div>
+            )) : (
+              <div style={{ gridColumn: '1 / -1', padding: '24px', textAlign: 'center', color: 'var(--ink-4)', border: '1px dashed var(--border-2)', borderRadius: '10px' }}>
+                Nenhuma observação registrada para este cliente.
+              </div>
+            )}
+          </div>
+        </section>
       </div>
+
+      {showObsModal && (
+        <div className="cj-modal-bg" style={{ zIndex: 999999 }}>
+          <div className="cj-modal" style={{ maxWidth: '440px', width: '90%' }}>
+            <div className="cj-modal-head">
+              <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: 'var(--ink)' }}>Nova Observação</h2>
+              <button className="cj-modal-x" onClick={() => setShowObsModal(false)}><Icon name="x" size={16}/></button>
+            </div>
+            <div className="cj-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div className="cj-field">
+                <label>Título</label>
+                <input 
+                  type="text" 
+                  className="cj-input" 
+                  value={obsForm.titulo} 
+                  onChange={e => setObsForm({ ...obsForm, titulo: e.target.value })} 
+                  placeholder="Ex: Detalhes do acidente..."
+                  autoFocus
+                />
+              </div>
+              <div className="cj-field">
+                <label>Observação</label>
+                <textarea 
+                  className="cj-input" 
+                  style={{ minHeight: '120px', resize: 'vertical' }}
+                  value={obsForm.texto} 
+                  onChange={e => setObsForm({ ...obsForm, texto: e.target.value })} 
+                  placeholder="Escreva os detalhes aqui..."
+                />
+              </div>
+            </div>
+            <div className="cj-modal-foot" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <button className="cj-btn" onClick={() => setShowObsModal(false)}>Cancelar</button>
+              <button className="cj-btn primary" disabled={!obsForm.titulo.trim() || !obsForm.texto.trim()} onClick={() => {
+                const nova = {
+                  titulo: obsForm.titulo.trim(),
+                  texto: obsForm.texto.trim(),
+                  data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                };
+                const novas = [...(cliente.observacoes || []), nova];
+                if (onEdit) onEdit({ ...cliente, observacoes: novas }, 'atualizar_cliente');
+                
+                if (supabase && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cliente.id)) {
+                  supabase.from('clientes').update({ observacoes: novas }).eq('id', cliente.id).catch(console.error);
+                }
+                
+                setShowObsModal(false);
+                setObsForm({ titulo: '', texto: '' });
+                flash && flash('Observação salva.');
+              }}>Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showDocModal && (
         <div className="cj-modal-bg" style={{ zIndex: 999999 }}>
